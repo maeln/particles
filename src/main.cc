@@ -1,6 +1,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/trigonometric.hpp>
 #include <algorithm>
 #include <string>
 #include <iostream>
@@ -9,7 +14,7 @@
 #include "data.h"
 
 #define BENCHMARK 230000
-#define MAX_POINT 10000
+#define MAX_POINT 1000
 #define TTL 2.5
 
 GLuint create_shader(GLenum type, const std::string& shader_src)
@@ -155,6 +160,13 @@ int main(void)
     // VAO
     glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
+	
+	// Face culling
+	glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
+    
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     
     // Time data
     double prev = 0.0;
@@ -174,6 +186,10 @@ int main(void)
 	vbo_point(points, data, &vbo, false);
 	
 	glfwSwapInterval(1);
+	
+	GLint time = glGetUniformLocation(program, "time");
+	GLint camera_location = glGetUniformLocation(program, "camera");
+	glm::mat4 camera_matrix = glm::perspective(glm::radians(90.f), 1.33f, 0.1f, 10.f);
     
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -183,11 +199,12 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT);
         
         glUseProgram(program);
+        glUniform1f(time, glfwGetTime());
+        glUniformMatrix4fv(camera_location, 1, GL_FALSE, glm::value_ptr(camera_matrix));
         
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-        glPointSize(3.0);
         glDrawArrays(GL_POINTS, 0, points.size());
         glDisableVertexAttribArray(0);
         glUseProgram(0);
