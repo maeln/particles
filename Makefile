@@ -8,6 +8,7 @@ TARGET = part
 
 SRC = src/main.cc \
 		src/tools.cc \
+		src/shader.cc \
 		libs/glad.c 
 
 all:
