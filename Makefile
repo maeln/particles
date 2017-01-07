@@ -7,7 +7,8 @@ LDFLAGS = -L/usr/local/lib -lXi -lGLEW -lGLU -lm -lGL -lm -lpthread -ldl -ldrm -
 TARGET = part
 
 SRC = src/main.cc \
-		libs/glad.c
+		src/tools.cc \
+		libs/glad.c 
 
 all:
 	$(CC) $(CFLAGS) $(SRC) $(LDFLAGS) -o $(TARGET)

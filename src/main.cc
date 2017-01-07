@@ -11,10 +11,13 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <cmath>
+
+#include "tools.h"
 #include "data.h"
 
 #define BENCHMARK 230000
-#define MAX_POINT 1000
+#define MAX_POINT 230000
 #define TTL 2.5
 
 GLuint create_shader(GLenum type, const std::string& shader_src)
@@ -70,18 +73,42 @@ void init_program(GLuint* program)
 {
 	std::vector<GLuint> shaders;
 	//shaders.push_back(create_shader(GL_GEOMETRY_SHADER, geometry_shader));
-	shaders.push_back(create_shader(GL_VERTEX_SHADER, vertex_shader));
-	shaders.push_back(create_shader(GL_FRAGMENT_SHADER, fragment_shader));
+	shaders.push_back(create_shader(GL_VERTEX_SHADER, read_file("data/particle.vs")));
+	shaders.push_back(create_shader(GL_FRAGMENT_SHADER, read_file("data/particle.fs")));
 	*program = create_program(shaders);
 	std::for_each(shaders.begin(), shaders.end(), glDeleteShader);
 }
 
+glm::vec3 lerp()
+{
+	float lp = (sin(glfwGetTime()/30.f)*sin(glfwGetTime()/30.f))*36.f;
+	int lower_bound = floor(lp);
+	int high_bound = ceil(lp);
+	glm::vec3 pt1 = ece[lower_bound] * (float)(lp-floor(lp));
+	glm::vec3 pt2 = ece[high_bound] * (float)(ceil(lp)-lp);
+	glm::vec3 res = (pt1+pt2);
+	return res/2.f;
+}
+
 std::default_random_engine gen;
 std::uniform_real_distribution<double> distrib(-1.0, 1.0);
+int eceit = 0;
 void create_new_point(Point* p) 
 {
 	// Init random
-    p->pos = glm::vec4(0.0, 0.0, 0.0, 1.0);
+	
+	eceit++;
+	if(eceit > 36)
+		eceit = 0;
+	
+    p->pos = glm::vec4(ece[eceit]/2.f, 1.0);
+    
+    //p->pos = glm::vec4(lerp(), 1.0);
+    //if(distrib(gen) > 0.0)
+	//	p->dir = glm::vec4(sin(glfwGetTime()*2.f), cos(glfwGetTime()*2.f), distrib(gen), 0.0);
+	//else
+	//	p->dir = glm::vec4(-sin(glfwGetTime()*2.f), -cos(glfwGetTime()*2.f), distrib(gen), 0.0);
+    
     p->dir = glm::vec4(distrib(gen), distrib(gen), distrib(gen), 0.0);
     p->ttl = TTL+(TTL*(distrib(gen)/2.0));
 }
@@ -197,6 +224,7 @@ int main(void)
 		curr = glfwGetTime();
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
+        glClearColor(1.f, 1.f, 1.f, 0.f);
         
         glUseProgram(program);
         glUniform1f(time, glfwGetTime());
