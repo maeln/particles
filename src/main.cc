@@ -18,7 +18,7 @@
 #include "data.h"
 
 #define BENCHMARK 230000
-#define MAX_POINT 230000
+#define MAX_POINT 100
 #define TTL 2.5
 
 void init_program(GLuint* program)
@@ -44,18 +44,11 @@ glm::vec3 lerp()
 
 std::default_random_engine gen;
 std::uniform_real_distribution<double> distrib(-1.0, 1.0);
-int eceit = 0;
 void create_new_point(Point* p) 
 {
 	// Init random
-	
-	eceit++;
-	if(eceit > 36)
-		eceit = 0;
-	
-    p->pos = glm::vec4(ece[eceit]/2.f, 1.0);
     
-    //p->pos = glm::vec4(lerp(), 1.0);
+    p->pos = glm::vec4(0.f, 0.f, 0.f, 1.f);
     //if(distrib(gen) > 0.0)
 	//	p->dir = glm::vec4(sin(glfwGetTime()*2.f), cos(glfwGetTime()*2.f), distrib(gen), 0.0);
 	//else
@@ -168,7 +161,7 @@ int main(void)
 	
 	GLint time = glGetUniformLocation(program, "time");
 	GLint camera_location = glGetUniformLocation(program, "camera");
-	glm::mat4 camera_matrix = glm::perspective(glm::radians(90.f), 1.33f, 0.1f, 10.f);
+	glm::mat4 camera_matrix = glm::perspective(glm::radians(45.f), 1.33f, 0.1f, 10.f);
     
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
