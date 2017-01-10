@@ -219,11 +219,22 @@ int main(void)
 	
 	// Mouse state vars.
 	double xpos, ypos;
-	int state
+	int state;
 	
-	GLint time = glGetUniformLocation(program, "time");
-	GLint camera_location = glGetUniformLocation(program, "camera");
+	// Shaders data.
+	GLint part_time = glGetUniformLocation(program, "time");
+	GLint part_pers = glGetUniformLocation(program, "camera");
+	GLint part_world = glGetUniformLocation(program, "world");
+	GLint part_eye = glGetUniformLocation(program, "eye");
+	
 	GLint pcam = glGetUniformLocation(pplane, "camera");
+	GLint pworld = glGetUniformLocation(pplane, "world");
+	
+	// Transformation matrice (World & Perspective).
+	glm::vec3 eye(1.f, 1.f, 1.f);
+	glm::vec3 center(0.f, 0.f, 0.f);
+	glm::vec3 up(0.f, 1.f, 0.f);
+	glm::mat4 world_matrix = glm::lookAt(eye, center, up);
 	glm::mat4 camera_matrix = glm::perspective(glm::radians(60.f), (float)resx/(float)resy, 0.1f, 10.f);
     
     /* Loop until the user closes the window */
@@ -235,8 +246,10 @@ int main(void)
         glClearColor(1.f, 1.f, 1.f, 0.f);
         
         glUseProgram(program);
-        glUniform1f(time, glfwGetTime());
-        glUniformMatrix4fv(camera_location, 1, GL_FALSE, glm::value_ptr(camera_matrix));
+        glUniform1f(part_time, glfwGetTime());
+        glUniformMatrix4fv(part_pers, 1, GL_FALSE, glm::value_ptr(camera_matrix));
+        glUniformMatrix4fv(part_world, 1, GL_FALSE, glm::value_ptr(world_matrix));
+        glUniform4f(part_eye, eye.x, eye.y, eye.z, 1.0);
         
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glEnableVertexAttribArray(0);
@@ -245,6 +258,7 @@ int main(void)
         
         glUseProgram(pplane);
         glUniformMatrix4fv(pcam, 1, GL_FALSE, glm::value_ptr(camera_matrix));
+        glUniformMatrix4fv(pworld, 1, GL_FALSE, glm::value_ptr(world_matrix));
 		glBindBuffer(GL_ARRAY_BUFFER, dplane);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
