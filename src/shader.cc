@@ -1,7 +1,7 @@
 #include "shader.h"
 #include <iostream>
 
-GLuint create_shader(GLenum type, const std::string& shader_src)
+GLuint create_shader(GLenum type, const std::string& shader_src, const std::string& name)
 {
 	GLuint shader = glCreateShader(type);
 	const char* shader_data = shader_src.c_str();
@@ -17,7 +17,7 @@ GLuint create_shader(GLenum type, const std::string& shader_src)
 		GLchar* log = new GLchar[log_len+1];
 		glGetShaderInfoLog(shader, log_len, NULL, log);
 		
-		std::cerr << "Shader compilation error: " << log << std::endl;
+		std::cerr << "Shader " << name << " compilation error: " << log << std::endl;
 		delete[] log;
 	}
 	

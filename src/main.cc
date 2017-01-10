@@ -19,13 +19,22 @@
 
 #define BENCHMARK 230000
 #define MAX_POINT 100
-#define TTL 2.5
+#define TTL 3
 
 void init_program(GLuint* program)
 {
 	std::vector<GLuint> shaders;
-	shaders.push_back(create_shader(GL_VERTEX_SHADER, read_file("data/particle.vs")));
-	shaders.push_back(create_shader(GL_FRAGMENT_SHADER, read_file("data/particle.fs")));
+	shaders.push_back(create_shader(GL_VERTEX_SHADER, read_file("data/particle.vs"), "particle.vs"));
+	shaders.push_back(create_shader(GL_FRAGMENT_SHADER, read_file("data/particle.fs"), "particle.fs"));
+	*program = create_program(shaders);
+	std::for_each(shaders.begin(), shaders.end(), glDeleteShader);
+}
+
+void program_plane(GLuint* program)
+{
+	std::vector<GLuint> shaders;
+	shaders.push_back(create_shader(GL_VERTEX_SHADER, read_file("data/plane.vs"), "plane.vs"));
+	shaders.push_back(create_shader(GL_FRAGMENT_SHADER, read_file("data/plane.fs"), "plane.fs"));
 	*program = create_program(shaders);
 	std::for_each(shaders.begin(), shaders.end(), glDeleteShader);
 }
@@ -36,7 +45,7 @@ bool first=true;
 void create_new_point(Point* p) 
 {
 	// Init random
-    p->pos = glm::vec4(0.f, 0.f, 0.f, 1.f);
+    p->pos = glm::vec4(distrib(gen), distrib(gen), distrib(gen), 1.f);
     /*
     if(first)
 		p->pos = glm::vec4(0.f, 0.f, 0.8, 1.f);
@@ -49,7 +58,7 @@ void create_new_point(Point* p)
 	//else
 	//	p->dir = glm::vec4(-sin(glfwGetTime()*2.f), -cos(glfwGetTime()*2.f), distrib(gen), 0.0);
     
-    p->dir = glm::vec4(distrib(gen)/2.0, distrib(gen)/2.0, distrib(gen)/2.0, 0.0);
+    p->dir = glm::vec4(distrib(gen)/3.0, distrib(gen)/3.0, distrib(gen)/3.0, 0.0);
     //p->dir = glm::vec4(0.f, 0.f, 0.f, 0.f);
     p->ttl = TTL+(TTL*(distrib(gen)/2.0));
     first = false;
@@ -101,9 +110,9 @@ void vbo_plane(GLuint* vbo_data, GLuint* vbo_ind)
 	glGenBuffers(1, vbo_ind);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, *vbo_data);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*3*plane_vert.size(), plane_vert.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*plane_vert.size(), plane_vert.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *vbo_ind);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*plane_ind.size(), plane_ind.data(), GL_STATIC_DRAW); 
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*plane_ind.size(), plane_ind.data(), GL_STATIC_DRAW); 
 }
 
 int main(void)
@@ -137,14 +146,20 @@ int main(void)
     glGenBuffers(1, &vbo);
     init_program(&program);
     
+    GLuint dplane, iplane, pplane;
+    vbo_plane(&dplane, &iplane);
+    program_plane(&pplane);
+    
     // VAO
     glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	
 	// Face culling
+	/*
 	glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CW);
+    */
     
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     
@@ -178,7 +193,8 @@ int main(void)
 	
 	GLint time = glGetUniformLocation(program, "time");
 	GLint camera_location = glGetUniformLocation(program, "camera");
-	glm::mat4 camera_matrix = glm::perspective(glm::radians(90.f), 1.33f, 0.1f, 10.f);
+	GLint pcam = glGetUniformLocation(pplane, "camera");
+	glm::mat4 camera_matrix = glm::perspective(glm::radians(60.f), 1.33f, 0.1f, 10.f);
     
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -196,6 +212,15 @@ int main(void)
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
         glDrawArrays(GL_POINTS, 0, points.size());
+        
+        glUseProgram(pplane);
+        glUniformMatrix4fv(pcam, 1, GL_FALSE, glm::value_ptr(camera_matrix));
+		glBindBuffer(GL_ARRAY_BUFFER, dplane);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iplane);
+		glDrawElements(GL_TRIANGLES, plane_ind.size(), GL_UNSIGNED_INT, 0);
+        
         glDisableVertexAttribArray(0);
         glUseProgram(0);
 

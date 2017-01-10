@@ -1,7 +1,10 @@
+#pragma once
+
 #include <string>
 #include <vector>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <glad/glad.h>
 
 struct Point
 {
@@ -11,10 +14,10 @@ struct Point
 };
 
 const std::vector<float> plane_vert = {
-	-1.000000, 0.000000,  1.000000,
-	 1.000000, 0.000000,  1.000000,
-	-1.000000, 0.000000, -1.000000,
-	 1.000000, 0.000000, -1.000000
+	-1.000000, -0.200000,  1.000000,
+	 1.000000, -0.200000,  1.000000,
+	-1.000000, -0.200000, -1.000000,
+	 1.000000, -0.200000, -1.000000
 };
 
 const std::vector<int> plane_ind = {
