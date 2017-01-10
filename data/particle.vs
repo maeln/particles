@@ -12,5 +12,5 @@ void main()
 	vec4 cameraPos = position + vec4(0.0, 0.0, -1.0, 0.0);
 	gl_Position = camera * cameraPos;
 	dist = sqrt(dot( cameraPos,  position));
-	gl_PointSize = 20.0/dist;
+	gl_PointSize = 8.0/dist;
 }

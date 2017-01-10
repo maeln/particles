@@ -18,8 +18,8 @@
 #include "data.h"
 
 #define BENCHMARK 230000
-#define MAX_POINT 2000
-#define TTL 3
+#define MAX_POINT 100000
+#define TTL 2
 
 void init_program(GLuint* program)
 {
@@ -58,7 +58,7 @@ void create_new_point(Point* p)
 	//else
 	//	p->dir = glm::vec4(-sin(glfwGetTime()*2.f), -cos(glfwGetTime()*2.f), distrib(gen), 0.0);
     
-    p->dir = glm::vec4(distrib(gen)/3.0, distrib(gen)/3.0, distrib(gen)/3.0, 0.0);
+    p->dir = glm::vec4(distrib(gen), distrib(gen), distrib(gen), 0.0);
     //p->dir = glm::vec4(0.f, 0.f, 0.f, 0.f);
     p->ttl = TTL+(TTL*(distrib(gen)/2.0));
     first = false;
@@ -217,6 +217,10 @@ int main(void)
 	
 	glfwSwapInterval(1);
 	
+	// Mouse state vars.
+	double xpos, ypos;
+	int state
+	
 	GLint time = glGetUniformLocation(program, "time");
 	GLint camera_location = glGetUniformLocation(program, "camera");
 	GLint pcam = glGetUniformLocation(pplane, "camera");
@@ -255,15 +259,17 @@ int main(void)
 
         /* Poll for and process events */
         glfwPollEvents();
-        
+        glfwGetCursorPos(window, &xpos, &ypos);
+        state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+		//if (state == GLFW_PRESS)
+			
         for(size_t n=0; n<points.size(); ++n)
 			update_point(&points[n], frameTime);
 		vbo_point(points, data, &vbo, true);
 		
 		std::cout << std::fixed;
 		std::cout.precision(8);
-		std::cout << "\rfps: " << 1.f/frameTime << " | Point drawed :" << points.size()
-			<< " | TTL1: " << points[0].ttl;
+		std::cout << "\rfps: " << 1.f/frameTime << " | Point drawed: " << points.size();
         
         prev = glfwGetTime();
         frameTime = prev-curr;
@@ -272,5 +278,6 @@ int main(void)
 	delete[] data;
 	
     glfwTerminate();
+    std::cout << std::endl;
     return 0;
 }
