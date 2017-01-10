@@ -120,6 +120,11 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+void error_callback(int error, const char* description)
+{
+    std::cerr << "GLFW Error (code: " << error << "): " << description << std::endl;
+}
+
 int main(void)
 {	
     GLFWwindow* window;
@@ -127,6 +132,7 @@ int main(void)
     /* Initialize the library */
     if (!glfwInit())
         return -1;
+    glfwSetErrorCallback(error_callback);
 	
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
