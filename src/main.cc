@@ -18,7 +18,7 @@
 #include "data.h"
 
 #define BENCHMARK 230000
-#define MAX_POINT 100
+#define MAX_POINT 2000
 #define TTL 3
 
 void init_program(GLuint* program)
@@ -45,7 +45,7 @@ bool first=true;
 void create_new_point(Point* p) 
 {
 	// Init random
-    p->pos = glm::vec4(distrib(gen), distrib(gen), distrib(gen), 1.f);
+    p->pos = glm::vec4(0.0, 0.0, 0.0, 1.f);
     /*
     if(first)
 		p->pos = glm::vec4(0.f, 0.f, 0.8, 1.f);
@@ -115,6 +115,11 @@ void vbo_plane(GLuint* vbo_data, GLuint* vbo_ind)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*plane_ind.size(), plane_ind.data(), GL_STATIC_DRAW); 
 }
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
 int main(void)
 {	
     GLFWwindow* window;
@@ -123,23 +128,28 @@ int main(void)
     if (!glfwInit())
         return -1;
 	
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     
+    GLuint resx = 1280; 
+    GLuint resy = 768;
+    
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1280, 768, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(resx, resy, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
         return -1;
     }
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
     gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+    glViewport(0, 0, resx, resy);
     
     // Init data
     GLuint vbo, vao, program;
@@ -194,7 +204,7 @@ int main(void)
 	GLint time = glGetUniformLocation(program, "time");
 	GLint camera_location = glGetUniformLocation(program, "camera");
 	GLint pcam = glGetUniformLocation(pplane, "camera");
-	glm::mat4 camera_matrix = glm::perspective(glm::radians(60.f), 1.33f, 0.1f, 10.f);
+	glm::mat4 camera_matrix = glm::perspective(glm::radians(60.f), (float)resx/(float)resy, 0.1f, 10.f);
     
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
