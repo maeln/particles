@@ -24,38 +24,35 @@
 void init_program(GLuint* program)
 {
 	std::vector<GLuint> shaders;
-	//shaders.push_back(create_shader(GL_GEOMETRY_SHADER, geometry_shader));
 	shaders.push_back(create_shader(GL_VERTEX_SHADER, read_file("data/particle.vs")));
 	shaders.push_back(create_shader(GL_FRAGMENT_SHADER, read_file("data/particle.fs")));
 	*program = create_program(shaders);
 	std::for_each(shaders.begin(), shaders.end(), glDeleteShader);
 }
 
-glm::vec3 lerp()
-{
-	float lp = (sin(glfwGetTime()/30.f)*sin(glfwGetTime()/30.f))*36.f;
-	int lower_bound = floor(lp);
-	int high_bound = ceil(lp);
-	glm::vec3 pt1 = ece[lower_bound] * (float)(lp-floor(lp));
-	glm::vec3 pt2 = ece[high_bound] * (float)(ceil(lp)-lp);
-	glm::vec3 res = (pt1+pt2);
-	return res/2.f;
-}
-
 std::default_random_engine gen;
 std::uniform_real_distribution<double> distrib(-1.0, 1.0);
+bool first=true;
 void create_new_point(Point* p) 
 {
 	// Init random
-    
     p->pos = glm::vec4(0.f, 0.f, 0.f, 1.f);
+    /*
+    if(first)
+		p->pos = glm::vec4(0.f, 0.f, 0.8, 1.f);
+	else
+		p->pos = glm::vec4(0.f, 0.f, 0.f, 1.f);
+	*/
+	
     //if(distrib(gen) > 0.0)
 	//	p->dir = glm::vec4(sin(glfwGetTime()*2.f), cos(glfwGetTime()*2.f), distrib(gen), 0.0);
 	//else
 	//	p->dir = glm::vec4(-sin(glfwGetTime()*2.f), -cos(glfwGetTime()*2.f), distrib(gen), 0.0);
     
-    p->dir = glm::vec4(distrib(gen), distrib(gen), distrib(gen), 0.0);
+    p->dir = glm::vec4(distrib(gen)/2.0, distrib(gen)/2.0, distrib(gen)/2.0, 0.0);
+    //p->dir = glm::vec4(0.f, 0.f, 0.f, 0.f);
     p->ttl = TTL+(TTL*(distrib(gen)/2.0));
+    first = false;
 }
 
 void update_point(Point* p, double dt)
@@ -98,6 +95,17 @@ void vbo_point(std::vector<Point>& points, float* data, GLuint* vbo, bool update
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void vbo_plane(GLuint* vbo_data, GLuint* vbo_ind)
+{
+	glGenBuffers(1, vbo_data);
+	glGenBuffers(1, vbo_ind);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, *vbo_data);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*3*plane_vert.size(), plane_vert.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *vbo_ind);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*plane_ind.size(), plane_ind.data(), GL_STATIC_DRAW); 
+}
+
 int main(void)
 {	
     GLFWwindow* window;
@@ -113,7 +121,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(800, 600, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(1280, 768, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -140,6 +148,15 @@ int main(void)
     
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     
+	glEnable(GL_DEPTH_TEST);
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LEQUAL);
+		glDepthRange(0.f, 1.f);
+	glEnable(GL_DEPTH_CLAMP);
+	
+	glEnable(GL_BLEND) ;
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
     // Time data
     double prev = 0.0;
     double curr = 0.0;
@@ -161,14 +178,14 @@ int main(void)
 	
 	GLint time = glGetUniformLocation(program, "time");
 	GLint camera_location = glGetUniformLocation(program, "camera");
-	glm::mat4 camera_matrix = glm::perspective(glm::radians(45.f), 1.33f, 0.1f, 10.f);
+	glm::mat4 camera_matrix = glm::perspective(glm::radians(90.f), 1.33f, 0.1f, 10.f);
     
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
 		curr = glfwGetTime();
         /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glClearColor(1.f, 1.f, 1.f, 0.f);
         
         glUseProgram(program);
@@ -194,7 +211,7 @@ int main(void)
 		
 		std::cout << std::fixed;
 		std::cout.precision(8);
-		std::cout << "\rfps: " << 1.d/frameTime << " | Point drawed :" << points.size()
+		std::cout << "\rfps: " << 1.f/frameTime << " | Point drawed :" << points.size()
 			<< " | TTL1: " << points[0].ttl;
         
         prev = glfwGetTime();
