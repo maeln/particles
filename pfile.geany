@@ -1,0 +1,50 @@
+[editor]
+line_wrapping=false
+line_break_column=72
+auto_continue_multiline=true
+
+[file_prefs]
+final_new_line=true
+ensure_convert_new_lines=false
+strip_trailing_spaces=false
+replace_tabs=false
+
+[indentation]
+indent_width=4
+indent_type=1
+indent_hard_tab_width=8
+detect_indent=false
+detect_indent_width=false
+indent_mode=2
+
+[project]
+name=particles
+base_path=/home/maeln/Projets/OpenGL/particles
+description=
+file_patterns=
+
+[long line marker]
+long_line_behaviour=1
+long_line_column=72
+
+[files]
+current_page=5
+FILE_NAME_0=371;Make;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2FMakefile;0;4
+FILE_NAME_1=120;C;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fdata.h;0;4
+FILE_NAME_2=8675;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fmain.cc;0;4
+FILE_NAME_3=323;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fparticle_handler.cc;0;4
+FILE_NAME_4=230;C;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fparticle_handler.h;0;4
+FILE_NAME_5=283;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fwindow_handler.cc;0;4
+FILE_NAME_6=130;C;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fwindow_handler.h;0;4
+
+[build-menu]
+C++FT_00_LB=_Compile
+C++FT_00_CM=g++ -Wall -c "%f"
+C++FT_00_WD=
+C++FT_01_LB=_Build
+C++FT_01_CM=g++ -Wall -o "%e" "%f"
+C++FT_01_WD=
+C++FT_02_LB=_Lint
+C++FT_02_CM=cppcheck --language=c++ --enable=warning,style --template=gcc "%f"
+C++FT_02_WD=
+filetypes=C++;

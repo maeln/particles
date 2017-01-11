@@ -8,7 +8,7 @@ TARGET = part
 
 SRC = src/main.cc \
 		src/tools.cc \
-		src/shader.cc \
+		src/shader_handler.cc \
 		src/window_handler.cc \
 		src/particle_handler.cc \
 		libs/glad.c 
