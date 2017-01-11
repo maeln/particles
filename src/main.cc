@@ -18,8 +18,8 @@
 #include "data.h"
 
 #define BENCHMARK 230000
-#define MAX_POINT 100000
-#define TTL 2
+#define MAX_POINT 1000
+#define TTL 5
 
 void init_program(GLuint* program)
 {
@@ -60,7 +60,7 @@ void create_new_point(Point* p)
     
     p->dir = glm::vec4(distrib(gen), distrib(gen), distrib(gen), 0.0);
     //p->dir = glm::vec4(0.f, 0.f, 0.f, 0.f);
-    p->ttl = TTL+(TTL*(distrib(gen)/2.0));
+    p->ttl = TTL; //+(TTL*(distrib(gen)/2.0));
     first = false;
 }
 
@@ -125,12 +125,6 @@ void error_callback(int error, const char* description)
     std::cerr << "GLFW Error (code: " << error << "): " << description << std::endl;
 }
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-}
-
 
 int main(void)
 {	
@@ -158,9 +152,8 @@ int main(void)
         return -1;
     }
     
-    // Window event & keyboard callback.
+    // Window event.
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetKeyCallback(window, key_callback);
 	
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
@@ -218,8 +211,10 @@ int main(void)
 	glfwSwapInterval(1);
 	
 	// Mouse state vars.
+	double mdx, mdy;
 	double xpos, ypos;
-	int state;
+	double mspeed = 0.00001;
+	int mouse_state;
 	
 	// Shaders data.
 	GLint part_time = glGetUniformLocation(program, "time");
@@ -231,11 +226,14 @@ int main(void)
 	GLint pworld = glGetUniformLocation(pplane, "world");
 	
 	// Transformation matrice (World & Perspective).
-	glm::vec3 eye(1.f, 1.f, 1.f);
+	glm::vec3 eye(-1.f, 0.f, 0.f);
 	glm::vec3 center(0.f, 0.f, 0.f);
 	glm::vec3 up(0.f, 1.f, 0.f);
+	glm::vec3 dir(center.x-eye.x, center.y-eye.y, center.z-eye.z);
 	glm::mat4 world_matrix = glm::lookAt(eye, center, up);
 	glm::mat4 camera_matrix = glm::perspective(glm::radians(60.f), (float)resx/(float)resy, 0.1f, 10.f);
+    
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
     
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -272,18 +270,41 @@ int main(void)
         glfwSwapBuffers(window);
 
         /* Poll for and process events */
-        glfwPollEvents();
+        
+        
+        mdx = xpos;
+        mdy = ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
-        state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
-		//if (state == GLFW_PRESS)
-			
+        mdx -= xpos;
+        mdy -= ypos;
+        mouse_state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+		if (mouse_state == GLFW_PRESS)
+		{
+			world_matrix; //TODO: translate with keyboard
+		}
+		
+		int zkey = glfwGetKey(window, GLFW_KEY_Z);
+		int skey = glfwGetKey(window, GLFW_KEY_S);
+		int qkey = glfwGetKey(window, GLFW_KEY_Q);
+		int dkey = glfwGetKey(window, GLFW_KEY_D);
+		std::cerr << zkey <<std::endl;
+		if (zkey == GLFW_PRESS)
+		{
+			std::cerr << "lel" << std::endl;
+			world_matrix = glm::translate(world_matrix, dir);
+		}
+		
+		dir = glm::vec3(center.x-eye.x, center.y-eye.y, center.z-eye.z);
+		
+		glfwPollEvents();
+		
         for(size_t n=0; n<points.size(); ++n)
 			update_point(&points[n], frameTime);
 		vbo_point(points, data, &vbo, true);
 		
-		std::cout << std::fixed;
-		std::cout.precision(8);
-		std::cout << "\rfps: " << 1.f/frameTime << " | Point drawed: " << points.size();
+		//std::cout << std::fixed;
+		//std::cout.precision(8);
+		//std::cout << "\rfps: " << 1.f/frameTime << " | Point drawed: " << points.size();
         
         prev = glfwGetTime();
         frameTime = prev-curr;

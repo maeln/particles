@@ -13,6 +13,6 @@ void main()
 {
 	vec4 cameraPos = world * position;
 	gl_Position = camera * cameraPos;
-	dist = sqrt(dot(position,  eye));
-	gl_PointSize = 8.0*dist;
+	dist = distance(position, eye);
+	gl_PointSize = 10/dist;
 }
