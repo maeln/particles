@@ -55,7 +55,9 @@ private:
 	double m_prev_t;
 		
 	glm::vec3 m_eye;
-	glm::mat4 m_camera_matrix;
+	glm::vec3 m_center;
+	glm::vec3 m_up;
+	
 	glm::mat4 m_perpective_matrix;
 	
 	GLuint m_max_part;

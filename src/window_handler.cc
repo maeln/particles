@@ -157,10 +157,9 @@ void WindowHandler::setup()
 	glBindVertexArray(m_vao);
 	
 	m_eye = glm::vec3(-1.f, 0.f, 0.f);
-	glm::vec3 center(0.f, 0.f, 0.f);
-	glm::vec3 up(0.f, 1.f, 0.f);
+	m_center = glm::vec3(1.f, 0.f, 0.f);
+	m_up = glm::vec3(0.f, 1.f, 0.f);
 	
-	m_camera_matrix = glm::lookAt(m_eye, center, up);
 	m_perpective_matrix = glm::perspective(glm::radians(60.f), (float)m_width/(float)m_height, 0.1f, 10.f);
 	
 	m_shader_cache["part_vert"] = m_shaders.create_shader(GL_VERTEX_SHADER, "data/particle.vs");
@@ -188,10 +187,12 @@ void WindowHandler::rendering_loop()
         glClearColor(1.f, 1.f, 1.f, 0.f);
 		
 		// Render stuff here.
+		glm::mat4 camera_matrix = glm::lookAt(m_eye, m_center, m_up);
+		
 		glUseProgram(m_programs["particules"]->addr);
         glUniform1f(m_programs["particules"]->uniforms_location["time"], glfwGetTime());
         glUniformMatrix4fv(m_programs["particules"]->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
-        glUniformMatrix4fv(m_programs["particules"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(m_camera_matrix));
+        glUniformMatrix4fv(m_programs["particules"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(camera_matrix));
         glUniform4f(m_programs["particules"]->uniforms_location["eye"], m_eye.x, m_eye.y, m_eye.z, 1.0);
         
         glBindBuffer(GL_ARRAY_BUFFER, m_particles->get_vbo());
@@ -201,7 +202,7 @@ void WindowHandler::rendering_loop()
         
         glUseProgram(mpp);
         glUniformMatrix4fv(pers, 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
-        glUniformMatrix4fv(cam, 1, GL_FALSE, glm::value_ptr(m_camera_matrix));
+        glUniformMatrix4fv(cam, 1, GL_FALSE, glm::value_ptr(camera_matrix));
 		glBindBuffer(GL_ARRAY_BUFFER, mpd);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -240,8 +241,28 @@ void WindowHandler::error_callback(int error, const char* description)
 
 void WindowHandler::keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	std::cout << "debug" << std::endl;
 	if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	
+	/*
+	if(key == GLFW_KEY_W)
+	{
+		m_eye += (m_center
+	}
+		
+	if(key == GLFW_KEY_S)
+	{
+	}
+		
+	if(key == GLFW_KEY_A)
+	{
+	}
+		
+	if(key == GLFW_KEY_D)
+	{
+	}	
+	*/
 	
 	if(key == GLFW_KEY_V && action == GLFW_PRESS)
 	{
