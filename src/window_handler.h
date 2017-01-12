@@ -43,6 +43,7 @@ private:
 	GLuint m_vao;
 	GLuint m_width;
 	GLuint m_height;
+	bool m_vsync;
 	
 	GLuint mpp, mpd, mpi;
 	GLint pers, cam;

@@ -41,7 +41,7 @@ void ParticleHandler::update_particules(float dt, float speed_factor)
 	{
 		for(GLuint n=0; n<m_part_vel.size(); ++n)
 		{
-			m_part_pos[n] += m_part_vel[n]*speed_factor;
+			m_part_pos[n] += m_part_vel[n]*speed_factor*dt;
 		}
 		
 		for(GLuint n=0; n<m_part_ttl.size(); ++n)

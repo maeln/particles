@@ -126,6 +126,7 @@ WindowHandler::WindowHandler()
 	
 	m_max_part = 1000;
 	m_particles = new ParticleHandler(m_max_part, 2.5, 0.5);
+	m_vsync = true;
 }
 
 WindowHandler::~WindowHandler()
@@ -149,7 +150,7 @@ void WindowHandler::setup()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	// VSync.
-	glfwSwapInterval(1);
+	glfwSwapInterval(m_vsync ? 1 : 0);
 	
 	// VAO
 	glGenVertexArrays(1, &m_vao);
@@ -211,7 +212,7 @@ void WindowHandler::rendering_loop()
         glUseProgram(0);
         
         // End of the loop stuff.
-        m_particles->update_particules(m_frame_dt, 0.01);
+        m_particles->update_particules(m_frame_dt, 0.5);
 		
         std::cout << std::fixed;
 		std::cout.precision(8);
@@ -241,8 +242,12 @@ void WindowHandler::keyboard_callback(GLFWwindow* window, int key, int scancode,
 {
 	if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	
 	if(key == GLFW_KEY_V && action == GLFW_PRESS)
-		glfwSwapInterval(0);
+	{
+		m_vsync = !m_vsync;
+		glfwSwapInterval(m_vsync ? 1 : 0);
+	}
 }
 
 void WindowHandler::mouse_callback(GLFWwindow* window, double xpos, double ypos)
