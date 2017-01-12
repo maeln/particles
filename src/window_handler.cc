@@ -215,8 +215,8 @@ void WindowHandler::rendering_loop()
         m_particles->update_particules(m_frame_dt, 0.5);
 		
         std::cout << std::fixed;
-		std::cout.precision(8);
-		std::cout << "\rfps: " << 1.f/m_frame_dt << " | Point drawed: " << m_max_part << std::endl;
+		std::cout.precision(0);
+		std::cout << "\rfps: " << 1.f/m_frame_dt << " | Point drawed: " << m_max_part << "           ";
 		
 		// Swapping buffers & polling events.
 		glfwSwapBuffers(m_window);
