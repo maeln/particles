@@ -128,7 +128,7 @@ WindowHandler::WindowHandler()
 	m_particles = new ParticleHandler(m_max_part, 2.5, 0.5);
 	m_vsync = true;
 	
-	m_camera = new Camera(glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 0.5);
+	m_camera = new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5);
 }
 
 WindowHandler::~WindowHandler()
@@ -184,6 +184,18 @@ void WindowHandler::rendering_loop()
         // Clean Window.
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glClearColor(1.f, 1.f, 1.f, 0.f);
+        
+        if(glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
+			m_camera->process_key(GLFW_KEY_W, m_frame_dt);
+		
+        if(glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
+			m_camera->process_key(GLFW_KEY_S, m_frame_dt);
+			 
+        if(glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
+			m_camera->process_key(GLFW_KEY_A, m_frame_dt);
+		
+        if(glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS) 
+			m_camera->process_key(GLFW_KEY_D, m_frame_dt);
 		
 		// Render stuff here.
 		glm::mat4 camera_matrix = glm::lookAt(m_camera->eye(), m_camera->target(), m_camera->up());
@@ -221,6 +233,7 @@ void WindowHandler::rendering_loop()
 		// Swapping buffers & polling events.
 		glfwSwapBuffers(m_window);
 		glfwPollEvents();
+		
 		m_frame_dt = glfwGetTime()-m_prev_t;
 	}
 }
@@ -243,7 +256,7 @@ void WindowHandler::keyboard_callback(GLFWwindow* window, int key, int scancode,
 	if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	
-	m_camera->process_key(key, m_frame_dt);
+	//m_camera->process_key(key, m_frame_dt);
 	
 	if(key == GLFW_KEY_V && action == GLFW_PRESS)
 	{
