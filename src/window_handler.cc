@@ -127,11 +127,14 @@ WindowHandler::WindowHandler()
 	m_max_part = 1000;
 	m_particles = new ParticleHandler(m_max_part, 2.5, 0.5);
 	m_vsync = true;
+	
+	m_camera = new Camera(glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 0.5);
 }
 
 WindowHandler::~WindowHandler()
 {
 	delete m_particles;
+	delete m_camera;
 	glfwTerminate();
 }
 
@@ -155,10 +158,6 @@ void WindowHandler::setup()
 	// VAO
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
-	
-	m_eye = glm::vec3(-1.f, 0.f, 0.f);
-	m_center = glm::vec3(1.f, 0.f, 0.f);
-	m_up = glm::vec3(0.f, 1.f, 0.f);
 	
 	m_perpective_matrix = glm::perspective(glm::radians(60.f), (float)m_width/(float)m_height, 0.1f, 10.f);
 	
@@ -187,13 +186,13 @@ void WindowHandler::rendering_loop()
         glClearColor(1.f, 1.f, 1.f, 0.f);
 		
 		// Render stuff here.
-		glm::mat4 camera_matrix = glm::lookAt(m_eye, m_center, m_up);
+		glm::mat4 camera_matrix = glm::lookAt(m_camera->eye(), m_camera->target(), m_camera->up());
 		
 		glUseProgram(m_programs["particules"]->addr);
         glUniform1f(m_programs["particules"]->uniforms_location["time"], glfwGetTime());
         glUniformMatrix4fv(m_programs["particules"]->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
         glUniformMatrix4fv(m_programs["particules"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(camera_matrix));
-        glUniform4f(m_programs["particules"]->uniforms_location["eye"], m_eye.x, m_eye.y, m_eye.z, 1.0);
+        glUniform4f(m_programs["particules"]->uniforms_location["eye"], m_camera->eye().x, m_camera->eye().y, m_camera->eye().z, 1.0);
         
         glBindBuffer(GL_ARRAY_BUFFER, m_particles->get_vbo());
         glEnableVertexAttribArray(0);
@@ -241,28 +240,10 @@ void WindowHandler::error_callback(int error, const char* description)
 
 void WindowHandler::keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	std::cout << "debug" << std::endl;
 	if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	
-	/*
-	if(key == GLFW_KEY_W)
-	{
-		m_eye += (m_center
-	}
-		
-	if(key == GLFW_KEY_S)
-	{
-	}
-		
-	if(key == GLFW_KEY_A)
-	{
-	}
-		
-	if(key == GLFW_KEY_D)
-	{
-	}	
-	*/
+	m_camera->process_key(key, m_frame_dt);
 	
 	if(key == GLFW_KEY_V && action == GLFW_PRESS)
 	{

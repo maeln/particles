@@ -11,6 +11,7 @@ SRC = src/main.cc \
 		src/shader_handler.cc \
 		src/window_handler.cc \
 		src/particle_handler.cc \
+		src/camera.cc \
 		libs/glad.c 
 
 all:

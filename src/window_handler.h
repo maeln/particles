@@ -9,6 +9,7 @@
 
 #include "particle_handler.h"
 #include "shader_handler.h"
+#include "camera.h"
 
 class WindowHandler
 {
@@ -54,15 +55,13 @@ private:
 	double m_frame_dt;
 	double m_prev_t;
 		
-	glm::vec3 m_eye;
-	glm::vec3 m_center;
-	glm::vec3 m_up;
+	Camera* m_camera;
 	
 	glm::mat4 m_perpective_matrix;
 	
 	GLuint m_max_part;
 	ParticleHandler* m_particles;
 	ShaderHandler& m_shaders = ShaderHandler::instance();
-	std::map<std::string, Shader*> m_shader_cache;
-	std::map<std::string, Program*> m_programs;
+	std::map<std::string, Shader*> m_shader_cache; //TODO: Delete pointer or use shared_ptr
+	std::map<std::string, Program*> m_programs; //TODO: Delete pointer or use shared_ptr
 };
