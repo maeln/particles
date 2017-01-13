@@ -29,18 +29,17 @@ long_line_column=72
 
 [files]
 current_page=5
-FILE_NAME_0=374;Make;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2FMakefile;0;4
+FILE_NAME_0=433;Make;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2FMakefile;0;4
 FILE_NAME_1=120;C;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fdata.h;0;4
 FILE_NAME_2=411;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fmain.cc;0;4
 FILE_NAME_3=1023;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fparticle_handler.cc;0;4
 FILE_NAME_4=549;C;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fparticle_handler.h;0;4
-FILE_NAME_5=6418;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fwindow_handler.cc;0;4
-FILE_NAME_6=1546;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fwindow_handler.h;0;4
+FILE_NAME_5=3878;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fwindow_handler.cc;0;4
+FILE_NAME_6=1918;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fwindow_handler.h;0;4
 FILE_NAME_7=2467;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fshader_handler.cc;0;4
 FILE_NAME_8=54;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fshader_handler.h;0;4
-FILE_NAME_9=74;C;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Ftools.h;0;4
-FILE_NAME_10=4609;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Ftmp%2Fparticles%2Fsrc%2Fmain.cc;0;4
-FILE_NAME_11=552;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Ftmp%2Fparticles%2Fsrc%2Fshader.cc;0;4
+FILE_NAME_9=426;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fcamera.h;0;4
+FILE_NAME_10=815;C++;0;EUTF-8;1;1;0;%2Fhome%2Fmaeln%2FProjets%2FOpenGL%2Fparticles%2Fsrc%2Fcamera.cc;0;4
 
 [build-menu]
 C++FT_00_LB=_Compile

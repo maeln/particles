@@ -125,10 +125,10 @@ WindowHandler::WindowHandler()
 	m_prev_t = 0.d;
 	
 	m_max_part = 1000;
-	m_particles = new ParticleHandler(m_max_part, 2.5, 0.5);
+	m_particles = new ParticleHandler(m_max_part, 2.5, 1.0);
 	m_vsync = true;
 	
-	m_camera = new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5);
+	m_camera = new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5, 1.0);
 }
 
 WindowHandler::~WindowHandler()
