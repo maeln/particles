@@ -11,25 +11,11 @@ Camera::Camera(glm::vec3 eye, glm::vec3 target, glm::vec3 up, float kspeed, floa
 	m_up = up;
 	m_kspeed = glm::vec3(kspeed);
 	m_mspeed = mspeed;
-	m_view = glm::lookAt(m_eye, m_target, m_up);
 	
-	glm::vec3 htarget(m_target.x, 0.f, m_target.z);
-	htarget = glm::normalize(htarget);
-	if(htarget.z >= 0.f)
-	{
-		if(htarget.x >= 0.f)
-			m_hangle = 360.f - glm::degrees(glm::asin(htarget.z));
-		else
-			m_hangle = 180.f + glm::degrees(glm::asin(htarget.z));
-	}
-	else
-	{
-		if(htarget.x >= 0.f)
-			m_hangle = glm::degrees(glm::asin(-htarget.z));
-		else
-			m_hangle = 180.f - glm::degrees(glm::asin(-htarget.z));
-	}
-	m_vangle = -glm::degrees(glm::asin(m_target.y));
+	m_hangle = 0.f;
+	m_vangle = 0.f;
+	
+	m_view = glm::lookAt(m_eye, m_eye+m_target, m_up);
 }
 
 Camera::~Camera()
@@ -41,15 +27,21 @@ void Camera::process_mouse(float dx, float dy, float dt)
 	m_hangle += dx*m_mspeed*dt;
 	m_vangle += dy*m_mspeed*dt;
 	
-	glm::vec3 v_axis = glm::vec3(0.f, 1.f, 0.f);
-	glm::vec3 view = glm::vec3(1.f, 0.f, 0.f);
-	view = glm::normalize(glm::rotate(view, m_hangle, v_axis));
-	glm::vec3 h_axis = glm::normalize(glm::cross(v_axis, view));
-	view = glm::normalize(glm::rotate(view, m_vangle, h_axis));
-	m_target = view;
-	m_up = glm::normalize(glm::cross(m_target, h_axis));
+	m_target = glm::vec3(
+		glm::cos(m_vangle)*glm::sin(m_hangle),
+		glm::sin(m_vangle),
+		glm::cos(m_vangle)*glm::cos(m_hangle)
+	);
 	
-	m_view = glm::lookAt(m_eye, m_target, m_up);
+	glm::vec3 right = glm::vec3(
+		glm::sin(m_hangle - 3.14f/2.f),
+		0,
+		glm::cos(m_hangle - 3.14f/2.f)
+	);
+	
+	m_up = glm::cross(right, m_target);
+	
+	m_view = glm::lookAt(m_eye, m_eye+m_target, m_up);
 }
 
 void Camera::process_key(int key, float dt)
@@ -78,7 +70,17 @@ void Camera::process_key(int key, float dt)
 		m_eye += (left * m_kspeed * glm::vec3(dt));
 	}
 	
-	m_view = glm::lookAt(m_eye, m_target, m_up);
+	if(key == GLFW_KEY_SPACE)
+	{
+		m_eye += (glm::vec3(0.f, 1.f, 0.f) * m_kspeed * glm::vec3(dt));
+	}
+	
+	if(key == GLFW_KEY_LEFT_CONTROL)
+	{
+		m_eye -= (glm::vec3(0.f, 1.f, 0.f) * m_kspeed * glm::vec3(dt));
+	}
+	
+	m_view = glm::lookAt(m_eye, m_eye+m_target, m_up);
 }
 	
 void Camera::set_kspeed(float speed)

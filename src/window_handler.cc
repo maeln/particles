@@ -128,7 +128,7 @@ WindowHandler::WindowHandler()
 	m_particles = new ParticleHandler(m_max_part, 2.5, 1.0);
 	m_vsync = true;
 	
-	m_camera = new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5, 1.0);
+	m_camera = new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5, 0.5);
 }
 
 WindowHandler::~WindowHandler()
@@ -200,6 +200,12 @@ void WindowHandler::rendering_loop()
 		
         if(glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS) 
 			m_camera->process_key(GLFW_KEY_D, m_frame_dt);
+		
+		if(glfwGetKey(m_window, GLFW_KEY_SPACE) == GLFW_PRESS)
+			m_camera->process_key(GLFW_KEY_SPACE, m_frame_dt);
+		
+		if(glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+			m_camera->process_key(GLFW_KEY_LEFT_CONTROL, m_frame_dt);
 		
 		mouse_dx = mouse_x;
 		mouse_dy = mouse_y;
