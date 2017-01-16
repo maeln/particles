@@ -217,6 +217,15 @@ void WindowHandler::rendering_loop()
 			m_camera->process_mouse((float)mouse_dx, (float)mouse_dy, m_frame_dt);
 		
 		// Render stuff here.
+		glUseProgram(mpp);
+        glUniformMatrix4fv(pers, 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
+        glUniformMatrix4fv(cam, 1, GL_FALSE, glm::value_ptr(m_camera->view()));
+		glBindBuffer(GL_ARRAY_BUFFER, mpd);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mpi);
+		glDrawElements(GL_TRIANGLES, plane_ind.size(), GL_UNSIGNED_INT, 0);
+		
 		glUseProgram(m_programs["particules"]->addr);
         glUniform1f(m_programs["particules"]->uniforms_location["time"], glfwGetTime());
         glUniformMatrix4fv(m_programs["particules"]->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
@@ -227,15 +236,6 @@ void WindowHandler::rendering_loop()
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
         glDrawArrays(GL_POINTS, 0, m_max_part);
-        
-        glUseProgram(mpp);
-        glUniformMatrix4fv(pers, 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
-        glUniformMatrix4fv(cam, 1, GL_FALSE, glm::value_ptr(m_camera->view()));
-		glBindBuffer(GL_ARRAY_BUFFER, mpd);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mpi);
-		glDrawElements(GL_TRIANGLES, plane_ind.size(), GL_UNSIGNED_INT, 0);
         
         glDisableVertexAttribArray(0);
         glUseProgram(0);
