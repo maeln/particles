@@ -177,6 +177,10 @@ void WindowHandler::setup()
 
 void WindowHandler::rendering_loop()
 {
+	double mouse_x, mouse_y;
+	glfwGetCursorPos(m_window, &mouse_x, &mouse_y);
+	double mouse_dx = 0.f;
+	double mouse_dy = 0.f;
 	while (!glfwWindowShouldClose(m_window))
     {
 		m_prev_t = glfwGetTime();
@@ -197,13 +201,20 @@ void WindowHandler::rendering_loop()
         if(glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS) 
 			m_camera->process_key(GLFW_KEY_D, m_frame_dt);
 		
-		// Render stuff here.
-		glm::mat4 camera_matrix = glm::lookAt(m_camera->eye(), m_camera->target(), m_camera->up());
+		mouse_dx = mouse_x;
+		mouse_dy = mouse_y;
+		glfwGetCursorPos(m_window, &mouse_x, &mouse_y);
+		mouse_dx -= mouse_x;
+		mouse_dy -= mouse_y;
 		
+		if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+			m_camera->process_mouse((float)mouse_dx, (float)mouse_dy, m_frame_dt);
+		
+		// Render stuff here.
 		glUseProgram(m_programs["particules"]->addr);
         glUniform1f(m_programs["particules"]->uniforms_location["time"], glfwGetTime());
         glUniformMatrix4fv(m_programs["particules"]->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
-        glUniformMatrix4fv(m_programs["particules"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(camera_matrix));
+        glUniformMatrix4fv(m_programs["particules"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(m_camera->view()));
         glUniform4f(m_programs["particules"]->uniforms_location["eye"], m_camera->eye().x, m_camera->eye().y, m_camera->eye().z, 1.0);
         
         glBindBuffer(GL_ARRAY_BUFFER, m_particles->get_vbo());
@@ -213,7 +224,7 @@ void WindowHandler::rendering_loop()
         
         glUseProgram(mpp);
         glUniformMatrix4fv(pers, 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
-        glUniformMatrix4fv(cam, 1, GL_FALSE, glm::value_ptr(camera_matrix));
+        glUniformMatrix4fv(cam, 1, GL_FALSE, glm::value_ptr(m_camera->view()));
 		glBindBuffer(GL_ARRAY_BUFFER, mpd);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
