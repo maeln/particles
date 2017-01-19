@@ -4,7 +4,7 @@
 #include <sstream>
 #include "tools.h"
 
-Shader* ShaderHandler::create_shader(GLenum type, const std::string& shader_src, const std::string& name)
+std::shared_ptr<Shader> ShaderHandler::create_shader(GLenum type, const std::string& shader_src, const std::string& name)
 {
 	GLuint shader = glCreateShader(type);
 	const char* shader_data = shader_src.c_str();
@@ -25,7 +25,7 @@ Shader* ShaderHandler::create_shader(GLenum type, const std::string& shader_src,
 	}
 	
 	// If the compilation worked, we find all the uniform in the shader.
-	Shader* shader_obj = new Shader(shader);
+	std::shared_ptr<Shader> shader_obj(new Shader(shader));
 	
 	std::istringstream src(shader_src);
 	std::string line;
@@ -45,13 +45,13 @@ Shader* ShaderHandler::create_shader(GLenum type, const std::string& shader_src,
 	return shader_obj;
 }
 
-Shader* ShaderHandler::create_shader(GLenum type, const std::string& filepath)
+std::shared_ptr<Shader> ShaderHandler::create_shader(GLenum type, const std::string& filepath)
 {
 	std::string shader_src = read_file(filepath);
 	return create_shader(type, shader_src, filepath);
 }
 
-Program* ShaderHandler::create_program(std::vector<Shader*>& shaders)
+std::shared_ptr<Program> ShaderHandler::create_program(std::vector<std::shared_ptr<Shader>>& shaders)
 {
 	GLuint program = glCreateProgram();
 	
@@ -75,7 +75,7 @@ Program* ShaderHandler::create_program(std::vector<Shader*>& shaders)
 		glDetachShader(program, shaders[n]->addr);
 	
 	// Manage uniform location.
-	Program* program_obj = new Program(program);
+	std::shared_ptr<Program> program_obj(new Program(program));
 	for(GLuint n=0; n<shaders.size(); ++n)
 	{
 		for(GLuint u=0; u<shaders[n]->uniforms.size(); ++u)

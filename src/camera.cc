@@ -75,7 +75,7 @@ void Camera::process_key(int key, float dt)
 		m_eye += (glm::vec3(0.f, 1.f, 0.f) * m_kspeed * glm::vec3(dt));
 	}
 	
-	if(key == GLFW_KEY_LEFT_CONTROL)
+	if(key == GLFW_KEY_LEFT_SHIFT)
 	{
 		m_eye -= (glm::vec3(0.f, 1.f, 0.f) * m_kspeed * glm::vec3(dt));
 	}

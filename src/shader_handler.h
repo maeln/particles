@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
 class Program
 {
@@ -32,9 +33,9 @@ public:
 		return instance;
 	}
 	
-	Shader* create_shader(GLenum type, const std::string& shader_src, const std::string& name);
-	Shader* create_shader(GLenum type, const std::string& filepath);
-	Program* create_program(std::vector<Shader*>& shaders);
+	std::shared_ptr<Shader> create_shader(GLenum type, const std::string& shader_src, const std::string& name);
+	std::shared_ptr<Shader> create_shader(GLenum type, const std::string& filepath);
+	std::shared_ptr<Program> create_program(std::vector<std::shared_ptr<Shader>>& shaders);
 	
 private:
 	ShaderHandler() {};

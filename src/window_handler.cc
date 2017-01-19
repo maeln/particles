@@ -163,12 +163,12 @@ void WindowHandler::setup()
 	
 	m_shader_cache["part_vert"] = m_shaders.create_shader(GL_VERTEX_SHADER, "data/particle.vs");
 	m_shader_cache["part_frag"] = m_shaders.create_shader(GL_FRAGMENT_SHADER, "data/particle.fs");
-	std::vector<Shader*> part_shader = {m_shader_cache["part_vert"], m_shader_cache["part_frag"]};
+	std::vector<std::shared_ptr<Shader>> part_shader = {m_shader_cache["part_vert"], m_shader_cache["part_frag"]};
 	m_programs["particules"] = m_shaders.create_program(part_shader);
 	
 	m_shader_cache["plane_vert"] = m_shaders.create_shader(GL_VERTEX_SHADER, "data/plane.vs");
 	m_shader_cache["plane_frag"] = m_shaders.create_shader(GL_FRAGMENT_SHADER, "data/plane.fs");
-	std::vector<Shader*> plane_shader = {m_shader_cache["plane_vert"], m_shader_cache["plane_frag"]};
+	std::vector<std::shared_ptr<Shader>> plane_shader = {m_shader_cache["plane_vert"], m_shader_cache["plane_frag"]};
 	m_programs["plane"] = m_shaders.create_program(plane_shader);
 	
 	program_plane(&mpp, &pers, &cam);
@@ -204,8 +204,8 @@ void WindowHandler::rendering_loop()
 		if(glfwGetKey(m_window, GLFW_KEY_SPACE) == GLFW_PRESS)
 			m_camera->process_key(GLFW_KEY_SPACE, m_frame_dt);
 		
-		if(glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-			m_camera->process_key(GLFW_KEY_LEFT_CONTROL, m_frame_dt);
+		if(glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+			m_camera->process_key(GLFW_KEY_LEFT_SHIFT, m_frame_dt);
 		
 		mouse_dx = mouse_x;
 		mouse_dy = mouse_y;

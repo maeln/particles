@@ -6,6 +6,7 @@
 #include <glm/mat4x4.hpp>
 #include <map>
 #include <string>
+#include <memory>
 
 #include "particle_handler.h"
 #include "shader_handler.h"
@@ -62,6 +63,6 @@ private:
 	GLuint m_max_part;
 	ParticleHandler* m_particles;
 	ShaderHandler& m_shaders = ShaderHandler::instance();
-	std::map<std::string, Shader*> m_shader_cache; //TODO: Delete pointer or use shared_ptr
-	std::map<std::string, Program*> m_programs; //TODO: Delete pointer or use shared_ptr
+	std::map<std::string, std::shared_ptr<Shader>> m_shader_cache; //TODO: Delete pointer or use shared_ptr
+	std::map<std::string, std::shared_ptr<Program>> m_programs; //TODO: Delete pointer or use shared_ptr
 };
