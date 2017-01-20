@@ -4,6 +4,9 @@
 #include <random>
 #include <glad/glad.h>
 
+// TODO: Use Transform Feedback to move the particles instead of
+// doing it on the CPU.
+
 class ParticleHandler
 {
 public:

@@ -15,6 +15,6 @@ void main()
 		discard;
 	else {
 		float g = (dot(gl_PointCoord-0.5,gl_PointCoord-0.5) > 0.22 ? 0.6 : map(dot(gl_PointCoord-0.5,gl_PointCoord-0.5), 0.0, 0.21, 0.0, 0.6));
-		colour = vec4(g/1.5, 0.4, 0.6, 1.0);
+		colour = vec4(g/1.5, 0.4*(g/1.5), 0.6, 1.0);
 	}
 }

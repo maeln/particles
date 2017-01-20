@@ -56,12 +56,12 @@ private:
 	double m_frame_dt;
 	double m_prev_t;
 		
-	Camera* m_camera;
+	std::unique_ptr<Camera> m_camera;
 	
 	glm::mat4 m_perpective_matrix;
 	
 	GLuint m_max_part;
-	ParticleHandler* m_particles;
+	std::unique_ptr<ParticleHandler> m_particles;
 	ShaderHandler& m_shaders = ShaderHandler::instance();
 	std::map<std::string, std::shared_ptr<Shader>> m_shader_cache; //TODO: Delete pointer or use shared_ptr
 	std::map<std::string, std::shared_ptr<Program>> m_programs; //TODO: Delete pointer or use shared_ptr
