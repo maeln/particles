@@ -1,4 +1,4 @@
-#include "particle_handler.h"
+#include "particle_handler.hh"
 
 ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl)
 {

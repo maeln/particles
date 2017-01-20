@@ -1,4 +1,4 @@
-#include "window_handler.h"
+#include "window_handler.hh"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/vec4.hpp>
@@ -10,8 +10,8 @@
 #include <vector>
 #include <exception>
 
-#include "tools.h"
-#include "data.h"
+#include "tools.hh"
+#include "data.hh"
 
 GLuint create_shader(GLenum type, const std::string& shader_src, const std::string& name)
 {

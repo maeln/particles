@@ -1,7 +1,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "tools.h"
+#include "tools.hh"
 
 std::string read_file(std::string path)
 {

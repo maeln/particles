@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 #include <vector>
-#include "mesh.h"
+#include "mesh.hh"
 
 /** 
  * Represent a Mesh that use indiced drawing.

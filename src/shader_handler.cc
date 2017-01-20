@@ -1,8 +1,8 @@
-#include "shader_handler.h"
+#include "shader_handler.hh"
 
 #include <iostream>
 #include <sstream>
-#include "tools.h"
+#include "tools.hh"
 
 std::shared_ptr<Shader> ShaderHandler::create_shader(GLenum type, const std::string& shader_src, const std::string& name)
 {

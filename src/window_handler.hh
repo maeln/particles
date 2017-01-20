@@ -8,9 +8,9 @@
 #include <string>
 #include <memory>
 
-#include "particle_handler.h"
-#include "shader_handler.h"
-#include "camera.h"
+#include "particle_handler.hh"
+#include "shader_handler.hh"
+#include "camera.hh"
 
 class WindowHandler
 {

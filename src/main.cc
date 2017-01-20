@@ -1,5 +1,5 @@
 #include <iostream>
-#include "window_handler.h"
+#include "window_handler.hh"
 
 int main(void)
 {	
