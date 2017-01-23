@@ -60,6 +60,6 @@ private:
 	GLuint m_max_part;
 	std::unique_ptr<ParticleHandler> m_particles;
 	ShaderHandler& m_shaders = ShaderHandler::instance();
-	std::map<std::string, std::shared_ptr<Shader>> m_shader_cache; //TODO: Delete pointer or use shared_ptr
-	std::map<std::string, std::shared_ptr<Program>> m_programs; //TODO: Delete pointer or use shared_ptr
+	std::map<std::string, std::shared_ptr<Shader>> m_shader_cache;
+	std::map<std::string, std::shared_ptr<Program>> m_programs;
 };
