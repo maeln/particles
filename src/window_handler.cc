@@ -12,78 +12,7 @@
 
 #include "tools.hh"
 #include "data.hh"
-
-GLuint create_shader(GLenum type, const std::string& shader_src, const std::string& name)
-{
-	GLuint shader = glCreateShader(type);
-	const char* shader_data = shader_src.c_str();
-	glShaderSource(shader, 1, &shader_data, NULL);
-	glCompileShader(shader);
-	
-	GLint status;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-	if(status == GL_FALSE)
-	{
-		GLint log_len;
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_len);
-		GLchar* log = new GLchar[log_len+1];
-		glGetShaderInfoLog(shader, log_len, NULL, log);
-		
-		std::cerr << "Shader " << name << " compilation error: " << log << std::endl;
-		delete[] log;
-	}
-	
-	return shader;
-}
-
-GLuint create_program(const std::vector<GLuint> &shaders)
-{
-	GLuint program = glCreateProgram();
-	
-	for(size_t n=0; n<shaders.size(); ++n)
-		glAttachShader(program, shaders[n]);
-	glLinkProgram(program);
-	
-	GLint status;
-	glGetProgramiv(program, GL_LINK_STATUS, &status);
-	if(status == GL_FALSE)
-	{
-		GLint log_length;
-		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
-		GLchar* log = new GLchar[log_length+1];
-		glGetProgramInfoLog(program, log_length, NULL, log);
-		std::cerr << "Program link failure: " << log << std::endl;
-		delete[] log;
-	}
-	
-	for(size_t n=0; n<shaders.size(); ++n)
-		glDetachShader(program, shaders[n]);
-	
-	return program;
-}
-
-void program_plane(GLuint* program, GLint* loc_pers, GLint* loc_cam)
-{
-	std::vector<GLuint> shaders;
-	shaders.push_back(create_shader(GL_VERTEX_SHADER, read_file("data/plane.vs"), "plane.vs"));
-	shaders.push_back(create_shader(GL_FRAGMENT_SHADER, read_file("data/plane.fs"), "plane.fs"));
-	*program = create_program(shaders);
-	std::for_each(shaders.begin(), shaders.end(), glDeleteShader);
-	
-	*loc_pers = glGetUniformLocation(*program, "camera");
-	*loc_cam = glGetUniformLocation(*program, "world");
-}
-
-void vbo_plane(GLuint* vbo_data, GLuint* vbo_ind)
-{
-	glGenBuffers(1, vbo_data);
-	glGenBuffers(1, vbo_ind);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, *vbo_data);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*plane_vert.size(), plane_vert.data(), GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *vbo_ind);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*plane_ind.size(), plane_ind.data(), GL_STATIC_DRAW); 
-}
+#include "indiced_mesh.hh"
 
 WindowHandler::WindowHandler()
 {
@@ -119,10 +48,10 @@ WindowHandler::WindowHandler()
     gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
     glViewport(0, 0, m_width, m_height);
     
-    m_mouse_dx = 0.d;
-	m_mouse_dy = 0.d;
-	m_frame_dt = 0.d;
-	m_prev_t = 0.d;
+    m_mouse_dx = 0.0;
+	m_mouse_dy = 0.0;
+	m_frame_dt = 0.0;
+	m_prev_t = 0.0;
 	
 	m_max_part = 1000;
 	m_particles = std::unique_ptr<ParticleHandler>(new ParticleHandler(m_max_part, 2.5, 1.0));
@@ -168,17 +97,18 @@ void WindowHandler::setup()
 	m_shader_cache["plane_frag"] = m_shaders.create_shader(GL_FRAGMENT_SHADER, "data/plane.fs");
 	std::vector<std::shared_ptr<Shader>> plane_shader = {m_shader_cache["plane_vert"], m_shader_cache["plane_frag"]};
 	m_programs["plane"] = m_shaders.create_program(plane_shader);
-	
-	program_plane(&mpp, &pers, &cam);
-	vbo_plane(&mpd, &mpi);
 }
 
 void WindowHandler::rendering_loop()
 {
+	IndicedMesh plane(std::unique_ptr<std::vector<float>>(new std::vector<float>(plane_vert, plane_vert+sizeof(plane_vert)/sizeof(float))),
+					  std::unique_ptr<std::vector<GLuint>>(new std::vector<GLuint>(plane_ind, plane_ind+sizeof(plane_ind)+sizeof(GLuint))));
+	plane.upload_to_gpu();
+	
 	double mouse_x, mouse_y;
 	glfwGetCursorPos(m_window, &mouse_x, &mouse_y);
-	double mouse_dx = 0.f;
-	double mouse_dy = 0.f;
+	double mouse_dx = 0.0;
+	double mouse_dy = 0.0;
 	while (!glfwWindowShouldClose(m_window))
     {
 		m_prev_t = glfwGetTime();
@@ -215,14 +145,10 @@ void WindowHandler::rendering_loop()
 			m_camera->process_mouse((float)mouse_dx, (float)mouse_dy, m_frame_dt);
 		
 		// Render stuff here.
-		glUseProgram(mpp);
-        glUniformMatrix4fv(pers, 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
-        glUniformMatrix4fv(cam, 1, GL_FALSE, glm::value_ptr(m_camera->view()));
-		glBindBuffer(GL_ARRAY_BUFFER, mpd);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mpi);
-		glDrawElements(GL_TRIANGLES, plane_ind.size(), GL_UNSIGNED_INT, 0);
+		glUseProgram(m_programs["plane"]->addr);
+        glUniformMatrix4fv(m_programs["plane"]->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
+        glUniformMatrix4fv(m_programs["plane"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(m_camera->view()));
+		plane.draw();
 		
 		glUseProgram(m_programs["particules"]->addr);
         glUniform1f(m_programs["particules"]->uniforms_location["time"], glfwGetTime());
@@ -243,7 +169,7 @@ void WindowHandler::rendering_loop()
 		
         std::cout << std::fixed;
 		std::cout.precision(0);
-		std::cout << "\rfps: " << 1.f/m_frame_dt << " | Point drawed: " << m_max_part << "           ";
+		std::cout << "\rfps: " << 1.0/m_frame_dt << " | Point drawed: " << m_max_part << "           ";
 		
 		// Swapping buffers & polling events.
 		glfwSwapBuffers(m_window);

@@ -47,9 +47,6 @@ private:
 	GLuint m_height;
 	bool m_vsync;
 	
-	GLuint mpp, mpd, mpi;
-	GLint pers, cam;
-	
 	double m_mouse_dx;
 	double m_mouse_dy;
 	
