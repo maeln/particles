@@ -96,12 +96,12 @@ void WindowHandler::setup()
 	std::vector<std::shared_ptr<Shader>> part_shader = {m_shader_cache["part_vert"], m_shader_cache["part_frag"]};
 	m_programs["particules"] = m_shaders.create_program(part_shader);
 	
-	/*
+	
 	m_shader_cache["plane_vert"] = m_shaders.create_shader(GL_VERTEX_SHADER, "data/plane.vs");
 	m_shader_cache["plane_frag"] = m_shaders.create_shader(GL_FRAGMENT_SHADER, "data/plane.fs");
 	std::vector<std::shared_ptr<Shader>> plane_shader = {m_shader_cache["plane_vert"], m_shader_cache["plane_frag"]};
 	m_programs["plane"] = m_shaders.create_program(plane_shader);
-	*/
+	
 }
 
 void WindowHandler::rendering_loop()
@@ -150,12 +150,10 @@ void WindowHandler::rendering_loop()
 			m_camera->process_mouse((float)mouse_dx, (float)mouse_dy, m_frame_dt);
 		
 		// Render stuff here.
-		/*
 		glUseProgram(m_programs["plane"]->addr);
         glUniformMatrix4fv(m_programs["plane"]->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
         glUniformMatrix4fv(m_programs["plane"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(m_camera->view()));
 		plane.draw();
-		*/
 		
 		glUseProgram(m_programs["particules"]->addr);
         glUniform1f(m_programs["particules"]->uniforms_location["time"], glfwGetTime());

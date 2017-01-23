@@ -13,7 +13,7 @@ public:
 	GLuint addr;
 	std::map<std::string, GLint> uniforms_location;
 	Program(GLuint p) {addr = p;};
-	~Program() {glDeleteProgram(addr)};
+	~Program() {glDeleteProgram(addr);};
 };
 
 class Shader
