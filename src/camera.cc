@@ -24,8 +24,8 @@ Camera::~Camera()
 
 void Camera::process_mouse(float dx, float dy, float dt)
 {
-	m_hangle += dx*m_mspeed*dt;
-	m_vangle += dy*m_mspeed*dt;
+	m_hangle += dx*m_mspeed;
+	m_vangle += dy*m_mspeed;
 	
 	m_target = glm::vec3(
 		glm::cos(m_vangle)*glm::sin(m_hangle),
