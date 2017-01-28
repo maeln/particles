@@ -1,11 +1,12 @@
 #include "particle_handler.hh"
 
-ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl)
+ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point)
 {
 	m_uniform = std::uniform_real_distribution<double>(-1.0, 1.0);
 	m_max_part = nb_particule;
 	m_ttl = ttl_particule;
 	m_dttl = delta_ttl;
+	m_pstart = start_point;
 	
 	m_part_pos.resize(m_max_part*3, 0.f);
 	m_part_vel.resize(m_max_part*3);
@@ -49,9 +50,9 @@ void ParticleHandler::update_particules(float dt, float speed_factor)
 			m_part_ttl[n] -= dt;
 			if(m_part_ttl[n] <= 0) // Particle is dead. Reset pos & vel.
 			{
-				m_part_pos[n*3] = 0.f;
-				m_part_pos[n*3+1] = 0.f;
-				m_part_pos[n*3+2] = 0.f;
+				m_part_pos[n*3] = m_pstart.x;
+				m_part_pos[n*3+1] = m_pstart.y;
+				m_part_pos[n*3+2] = m_pstart.z;
 				m_part_vel[n*3] = m_uniform(m_randgen);
 				m_part_vel[n*3+1] = m_uniform(m_randgen);
 				m_part_vel[n*3+2] = m_uniform(m_randgen);
