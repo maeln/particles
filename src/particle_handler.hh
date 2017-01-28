@@ -15,7 +15,7 @@
 class ParticleHandler
 {
 public:
-	ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point);
+	ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, bool random_colour, glm::vec3 base_colour);
 	~ParticleHandler();
 	
 	void update_particules(float dt, float speed_factor=1.f);

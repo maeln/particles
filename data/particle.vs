@@ -16,6 +16,6 @@ void main()
 	vec4 cameraPos = world * position;
 	gl_Position = camera * cameraPos;
 	dist = distance(position, eye);
-	gl_PointSize = 13.0/dist;
+	gl_PointSize = 6.0/dist;
 	vcolour = fcolour;
 }

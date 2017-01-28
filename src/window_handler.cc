@@ -53,9 +53,8 @@ WindowHandler::WindowHandler()
 	m_frame_dt = 0.0;
 	m_prev_t = 0.0;
 	
-	m_max_part = 100;
-	m_particles = std::unique_ptr<ParticleHandler>(new ParticleHandler(m_max_part, 5.0, 1.0, glm::vec3(0.0, 0.5, 0.0)));
-	m_particles->set_colour(glm::vec3(41.0/255.0, 114.0/255.0, 200.0/255.0));
+	m_max_part = 10000;
+	m_particles = std::unique_ptr<ParticleHandler>(new ParticleHandler(m_max_part, 2.5, 1.0, glm::vec3(0.0, 0.5, 0.0), false, glm::vec3(41.0/255.0, 114.0/255.0, 200.0/255.0)));
 	m_vsync = true;
 	
 	m_camera = std::unique_ptr<Camera>(new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5, 0.5));

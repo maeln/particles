@@ -3,7 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <cmath>
 
-ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point)
+ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, bool random_colour, glm::vec3 base_colour)
 {
 	m_uniform = std::uniform_real_distribution<double>(-1.0, 1.0);
 	m_max_part = nb_particule;
@@ -11,8 +11,8 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 	m_dttl = delta_ttl;
 	m_pstart = start_point;
 	
-	m_rand_colour = true;
-	m_base_colour = glm::vec3(0.0, 0.0, 0.0);
+	m_rand_colour = random_colour;
+	m_base_colour = base_colour;
 	
 	m_part_pos.resize((m_max_part*3)*2);
 	m_part_vel.resize(m_max_part*3);
@@ -27,15 +27,28 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 	}
 	
 	// Colour
-	for(GLuint n=0; n<(m_max_part*3); ++n)
+	if(m_rand_colour)
 	{
-		m_part_pos[m_max_part*3+n] = abs(m_uniform(m_randgen));
+		for(GLuint n=0; n<(m_max_part*3); ++n)
+		{
+			m_part_pos[m_max_part*3+n] = std::abs(m_uniform(m_randgen));
+		}
+	}
+	else
+	{
+		GLuint offset = m_max_part*3;
+		for(GLuint n=0; n<m_max_part; ++n)
+		{
+			m_part_pos[offset+n*3] = m_base_colour.r;
+			m_part_pos[offset+n*3+1] = m_base_colour.g;
+			m_part_pos[offset+n*3+2] = m_base_colour.b;
+		}
 	}
 	
 	// Velocity
 	for(GLuint n=0; n<m_part_vel.size(); ++n)
 	{
-		m_part_vel[n] = m_uniform(m_randgen)/3.0; // DEBUG
+		m_part_vel[n] = m_uniform(m_randgen);
 	}
 	
 	// Time to live
@@ -71,7 +84,7 @@ void ParticleHandler::update_particules(float dt, float speed_factor)
 		m_part_pos[n] += m_part_vel[n]*speed_factor*dt;
 	}
 	
-	for(GLuint n=0; n<m_part_ttl.size(); ++n)
+	for(GLuint n=0; n<m_max_part; ++n)
 	{
 		m_part_ttl[n] -= dt;
 		if(m_part_ttl[n] <= 0) // Particle is dead. Reset pos & vel.
@@ -79,17 +92,19 @@ void ParticleHandler::update_particules(float dt, float speed_factor)
 			m_part_pos[n*3] = m_pstart.x;
 			m_part_pos[n*3+1] = m_pstart.y;
 			m_part_pos[n*3+2] = m_pstart.z;
+			
 			m_part_vel[n*3] = m_uniform(m_randgen);
 			m_part_vel[n*3+1] = m_uniform(m_randgen);
 			m_part_vel[n*3+2] = m_uniform(m_randgen);
+			
 			m_part_ttl[n] = m_ttl + m_uniform(m_randgen) * m_dttl;
 			
 			GLuint offset = m_max_part*3;
 			if(m_rand_colour)
 			{
-				m_part_pos[offset+n*3] = abs(m_uniform(m_randgen));
-				m_part_pos[offset+n*3+1] = abs(m_uniform(m_randgen));
-				m_part_pos[offset+n*3+2] = abs(m_uniform(m_randgen));
+				m_part_pos[offset+n*3] = std::abs(m_uniform(m_randgen));
+				m_part_pos[offset+n*3+1] = std::abs(m_uniform(m_randgen));
+				m_part_pos[offset+n*3+2] = std::abs(m_uniform(m_randgen));
 			}
 			else
 			{
@@ -117,7 +132,7 @@ void ParticleHandler::draw(glm::mat4 camera, glm::mat4 world, double time, glm::
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*) (long) m_max_part*3);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*) (long) (m_max_part*3*sizeof(float)));
     glDrawArrays(GL_POINTS, 0, m_max_part);
     
     glDisableVertexAttribArray(0);
