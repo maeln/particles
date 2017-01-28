@@ -37,4 +37,5 @@ void IndicedMesh::draw()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_i_vbo);
 	glDrawElements(GL_TRIANGLES, m_indices->size(), GL_UNSIGNED_INT, 0);
+	glDisableVertexAttribArray(0);
 }

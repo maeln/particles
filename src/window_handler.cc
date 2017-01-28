@@ -53,8 +53,9 @@ WindowHandler::WindowHandler()
 	m_frame_dt = 0.0;
 	m_prev_t = 0.0;
 	
-	m_max_part = 10000;
-	m_particles = std::unique_ptr<ParticleHandler>(new ParticleHandler(m_max_part, 2.5, 1.0, glm::vec3(0.0, 0.5, 0.0)));
+	m_max_part = 100;
+	m_particles = std::unique_ptr<ParticleHandler>(new ParticleHandler(m_max_part, 5.0, 1.0, glm::vec3(0.0, 0.5, 0.0)));
+	m_particles->set_colour(glm::vec3(41.0/255.0, 114.0/255.0, 200.0/255.0));
 	m_vsync = true;
 	
 	m_camera = std::unique_ptr<Camera>(new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5, 0.5));
@@ -90,12 +91,6 @@ void WindowHandler::setup()
 	glBindVertexArray(m_vao);
 	
 	m_perpective_matrix = glm::perspective(glm::radians(60.f), (float)m_width/(float)m_height, 0.1f, 10.f);
-	
-	m_shader_cache["part_vert"] = m_shaders.create_shader(GL_VERTEX_SHADER, "data/particle.vs");
-	m_shader_cache["part_frag"] = m_shaders.create_shader(GL_FRAGMENT_SHADER, "data/particle.fs");
-	std::vector<std::shared_ptr<Shader>> part_shader = {m_shader_cache["part_vert"], m_shader_cache["part_frag"]};
-	m_programs["particules"] = m_shaders.create_program(part_shader);
-	
 	
 	m_shader_cache["plane_vert"] = m_shaders.create_shader(GL_VERTEX_SHADER, "data/plane.vs");
 	m_shader_cache["plane_frag"] = m_shaders.create_shader(GL_FRAGMENT_SHADER, "data/plane.fs");
@@ -155,18 +150,8 @@ void WindowHandler::rendering_loop()
         glUniformMatrix4fv(m_programs["plane"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(m_camera->view()));
 		plane.draw();
 		
-		glUseProgram(m_programs["particules"]->addr);
-        glUniform1f(m_programs["particules"]->uniforms_location["time"], glfwGetTime());
-        glUniformMatrix4fv(m_programs["particules"]->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
-        glUniformMatrix4fv(m_programs["particules"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(m_camera->view()));
-        glUniform4f(m_programs["particules"]->uniforms_location["eye"], m_camera->eye().x, m_camera->eye().y, m_camera->eye().z, 1.0);
+        m_particles->draw(m_perpective_matrix, m_camera->view(), glfwGetTime(), m_camera->eye());
         
-        glBindBuffer(GL_ARRAY_BUFFER, m_particles->get_vbo());
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glDrawArrays(GL_POINTS, 0, m_max_part);
-        
-        glDisableVertexAttribArray(0);
         glUseProgram(0);
         
         // End of the loop stuff.
@@ -174,7 +159,7 @@ void WindowHandler::rendering_loop()
 		
         std::cout << std::fixed;
 		std::cout.precision(0);
-		std::cout << "\rfps: " << 1.0/m_frame_dt << " | Point drawed: " << m_max_part << "           ";
+		std::cout << "\rfps: " << 1.0/m_frame_dt << " | Point drawed: " << m_max_part << " | colour: " << (m_particles->is_color_random() ?  "Random" : "Fixed") << "           ";
 		
 		// Swapping buffers & polling events.
 		glfwSwapBuffers(m_window);
@@ -208,6 +193,11 @@ void WindowHandler::keyboard_callback(GLFWwindow* window, int key, int scancode,
 	{
 		m_vsync = !m_vsync;
 		glfwSwapInterval(m_vsync ? 1 : 0);
+	}
+	
+	if(key == GLFW_KEY_N && action == GLFW_PRESS)
+	{
+		m_particles->set_random_colour(!m_particles->is_color_random());
 	}
 }
 
