@@ -13,6 +13,7 @@ SRC = src/main.cc \
 		src/particle_handler.cc \
 		src/camera.cc \
 		src/indiced_mesh.cc \
+		src/basic_mesh.cc \
 		libs/glad.c 
 
 all:

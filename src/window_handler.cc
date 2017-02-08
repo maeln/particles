@@ -101,7 +101,8 @@ void WindowHandler::setup()
 void WindowHandler::rendering_loop()
 {
 	IndicedMesh plane(std::unique_ptr<std::vector<float>>(new std::vector<float>(plane_vert, plane_vert+sizeof(plane_vert)/sizeof(float))),
-					  std::unique_ptr<std::vector<GLuint>>(new std::vector<GLuint>(plane_ind, plane_ind+sizeof(plane_ind)+sizeof(GLuint))));
+					  std::unique_ptr<std::vector<GLuint>>(new std::vector<GLuint>(plane_ind, plane_ind+sizeof(plane_ind)+sizeof(GLuint))),
+					  GL_TRIANGLES, 3);
 	plane.upload_to_gpu();
 	
 	double mouse_x, mouse_y;
