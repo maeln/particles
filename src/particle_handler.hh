@@ -17,10 +17,10 @@ class ParticleHandler
 public:
 	ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, bool random_colour, glm::vec3 base_colour);
 	~ParticleHandler();
-	
+
 	void update_particules(float dt, float speed_factor=1.f);
 	void draw(glm::mat4 camera, glm::mat4 world, double time, glm::vec3 eye);
-	
+
 	void set_colour(glm::vec3 col);
 	void set_random_colour(bool r);
 	bool is_color_random();
@@ -31,18 +31,18 @@ private:
 	float m_ttl;
 	float m_dttl;
 	glm::vec3 m_pstart;
-	
+
 	bool m_rand_colour;
 	glm::vec3 m_base_colour;
-	
+
 	std::default_random_engine m_randgen;
 	std::uniform_real_distribution<double> m_uniform;
-	
+
 	std::vector<float> m_part_pos;
 	std::vector<float> m_part_vel;
 	std::vector<float> m_colour;
 	std::vector<float> m_part_ttl;
-	
+
 	ShaderHandler& m_shaders = ShaderHandler::instance();
 	std::shared_ptr<Program> m_program;
 };

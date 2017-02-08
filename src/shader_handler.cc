@@ -10,7 +10,7 @@ std::shared_ptr<Shader> ShaderHandler::create_shader(GLenum type, const std::str
 	const char* shader_data = shader_src.c_str();
 	glShaderSource(shader, 1, &shader_data, NULL);
 	glCompileShader(shader);
-	
+
 	GLint status;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
 	if(status == GL_FALSE)
@@ -19,29 +19,30 @@ std::shared_ptr<Shader> ShaderHandler::create_shader(GLenum type, const std::str
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_len);
 		GLchar* log = new GLchar[log_len+1];
 		glGetShaderInfoLog(shader, log_len, NULL, log);
-		
+
 		std::cerr << "Shader " << name << " compilation error: " << log << std::endl;
 		delete[] log;
 	}
-	
+
 	// If the compilation worked, we find all the uniform in the shader.
 	std::shared_ptr<Shader> shader_obj(new Shader(shader));
-	
+
 	std::istringstream src(shader_src);
 	std::string line;
 	while(getline(src, line))
 	{
-		if(line.substr(0, 8) == "uniform ") 
+		if(line.substr(0, 8) == "uniform ")
 		{
 			std::istringstream str(line.substr(7));
-			std::string type; std::string name;
+			std::string type;
+			std::string name;
 			str >> type;
 			str >> name;
 			name.erase(name.find(";"), 1);
 			shader_obj->uniforms.push_back(name);
 		}
 	}
-	
+
 	return shader_obj;
 }
 
@@ -54,11 +55,11 @@ std::shared_ptr<Shader> ShaderHandler::create_shader(GLenum type, const std::str
 std::shared_ptr<Program> ShaderHandler::create_program(std::vector<std::shared_ptr<Shader>>& shaders)
 {
 	GLuint program = glCreateProgram();
-	
+
 	for(size_t n=0; n<shaders.size(); ++n)
 		glAttachShader(program, shaders[n]->addr);
 	glLinkProgram(program);
-	
+
 	GLint status;
 	glGetProgramiv(program, GL_LINK_STATUS, &status);
 	if(status == GL_FALSE)
@@ -70,10 +71,10 @@ std::shared_ptr<Program> ShaderHandler::create_program(std::vector<std::shared_p
 		std::cerr << "Program link failure: " << log << std::endl;
 		delete[] log;
 	}
-	
+
 	for(size_t n=0; n<shaders.size(); ++n)
 		glDetachShader(program, shaders[n]->addr);
-	
+
 	// Manage uniform location.
 	std::shared_ptr<Program> program_obj(new Program(program));
 	for(GLuint n=0; n<shaders.size(); ++n)
@@ -84,6 +85,6 @@ std::shared_ptr<Program> ShaderHandler::create_program(std::vector<std::shared_p
 				program_obj->uniforms_location[shaders[n]->uniforms[u]] = glGetUniformLocation(program, shaders[n]->uniforms[u].c_str());
 		}
 	}
-	
+
 	return program_obj;
 }
