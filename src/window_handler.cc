@@ -114,7 +114,7 @@ void WindowHandler::rendering_loop()
 	std::unique_ptr<std::vector<float>> snorm(new std::vector<float>());
 	std::unique_ptr<std::vector<GLuint>> sind(new std::vector<GLuint>());
 	
-	load_obj("data/suzanne.obj", svert.get(), sind.get(), snorm.get());
+	load_obj("data/text.obj", svert.get(), sind.get(), snorm.get());
 	IndicedMesh suzanne(std::move(svert), std::move(sind), GL_POINTS, 3);
 	suzanne.upload_to_gpu();
 
