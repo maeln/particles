@@ -172,6 +172,8 @@ void WindowHandler::rendering_loop()
 
 		//m_particles->draw(m_perpective_matrix, m_camera->view(), glfwGetTime(), m_camera->eye());
 
+		m_particles->draw(m_perpective_matrix, m_camera->view(), glfwGetTime(), m_camera->eye());
+
 		glUseProgram(0);
 
 		// End of the loop stuff.
