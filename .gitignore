@@ -2,3 +2,4 @@
 part
 libs/
 *.trace
+build/
