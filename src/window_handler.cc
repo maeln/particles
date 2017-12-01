@@ -45,7 +45,7 @@ WindowHandler::WindowHandler()
 
 	// OpenGL context.
 	glfwMakeContextCurrent(m_window);
-	gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+	glewInit();
 	glViewport(0, 0, m_width, m_height);
 
 	m_mouse_dx = 0.0;

@@ -3,7 +3,7 @@
 #include <vector>
 #include <random>
 #include <memory>
-#include <glad/glad.h>
+#include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/mat4x4.hpp>
 
