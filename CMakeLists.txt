@@ -27,6 +27,8 @@ add_definitions(
 )
 
 FILE(GLOB_RECURSE HEADERS "src/*.hh")
+FILE(GLOB_RECURSE DATA "data/*")
+source_group("Data" FILES ${DATA})
 add_executable(
 	parts 
 	src/main.cc 
@@ -38,6 +40,7 @@ add_executable(
 	src/indiced_mesh.cc 
 	src/basic_mesh.cc 
 	${HEADERS}
+	${DATA}
 )
 
 target_link_libraries(
