@@ -27,8 +27,10 @@ add_definitions(
 )
 
 FILE(GLOB_RECURSE HEADERS "src/*.hh")
-FILE(GLOB_RECURSE DATA "data/*")
-source_group("Data" FILES ${DATA})
+FILE(GLOB_RECURSE SHADER_GEOM "data/*.gs")
+FILE(GLOB_RECURSE SHADER_VERT "data/*.vs")
+FILE(GLOB_RECURSE SHADER_FRAG "data/*.fs")
+source_group("Data" FILES ${SHADER_GEOM} ${SHADER_FRAG} ${SHADER_VERT})
 add_executable(
 	parts 
 	src/main.cc 
@@ -40,7 +42,9 @@ add_executable(
 	src/indiced_mesh.cc 
 	src/basic_mesh.cc 
 	${HEADERS}
-	${DATA}
+	${SHADER_GEOM} 
+	${SHADER_FRAG} 
+	${SHADER_VERT}
 )
 
 target_link_libraries(
