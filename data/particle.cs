@@ -34,7 +34,7 @@ void main(void)
 	}
 	else 
 	{
-		positions[id] = pos * vel * dt * speed;
+		positions[id] = pos + (vel * dt * speed);
 		ttls[id] = ttl - dt;
 	}
 }
