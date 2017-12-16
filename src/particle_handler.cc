@@ -60,25 +60,52 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 		}
 	}
 
-	glGenBuffers(1, &m_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*m_part_pos.size(), m_part_pos.data(), GL_STREAM_DRAW);
+	glGenBuffers(1, &m_vbo_pos);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_pos);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*m_part_pos.size(), m_part_pos.data(), GL_DYNAMIC_COPY);
+	
+	glGenBuffers(1, &m_vbo_vel);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_vel);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*m_part_vel.size(), m_part_vel.data(), GL_DYNAMIC_COPY);
+
+	glGenBuffers(1, &m_vbo_ttl);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_ttl);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*m_part_ttl.size(), m_part_ttl.data(), GL_DYNAMIC_COPY);
+	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// shaders.
 	std::shared_ptr<Shader> vertex_shader = m_shaders.create_shader(GL_VERTEX_SHADER, "data/particle.vs");
 	std::shared_ptr<Shader> pixel_shader = m_shaders.create_shader(GL_FRAGMENT_SHADER, "data/particle.fs");
-	std::vector<std::shared_ptr<Shader>> part_shader = {vertex_shader, pixel_shader};
-	m_program = m_shaders.create_program(part_shader);
+	std::vector<std::shared_ptr<Shader>> ps = { vertex_shader, pixel_shader };
+	m_program = m_shaders.create_program(ps);
+
+	// Compute shader.
+	std::shared_ptr<Shader> compute_shader = m_shaders.create_shader(GL_COMPUTE_SHADER, "data/particle.cs");
+	std::vector<std::shared_ptr<Shader>> cs = { compute_shader };
+	m_compute = m_shaders.create_program(cs);
 }
 
 ParticleHandler::~ParticleHandler()
 {
-	glDeleteBuffers(1, &m_vbo);
+	glDeleteBuffers(1, &m_vbo_pos);
+	glDeleteBuffers(1, &m_vbo_vel);
+	glDeleteBuffers(1, &m_vbo_ttl);
 }
 
 void ParticleHandler::update_particules(float dt, float speed_factor)
 {
+	glUseProgram(m_compute->addr);
+	glUniform1f(m_compute->uniforms_location["dt"], dt);
+	glUniform1f(m_compute->uniforms_location["speed"], speed_factor);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_vbo_pos);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_vbo_vel);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_vbo_ttl);
+	glDispatchCompute(m_max_part / 128, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	glUseProgram(0);
+
+	/*
 	for(GLuint n=0; n<m_part_vel.size(); ++n)
 	{
 		m_part_pos[n] += m_part_vel[n]*speed_factor*dt;
@@ -118,6 +145,7 @@ void ParticleHandler::update_particules(float dt, float speed_factor)
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float)*m_part_pos.size(), m_part_pos.data());
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	*/
 }
 
 void ParticleHandler::draw(glm::mat4 camera, glm::mat4 world, double time, glm::vec3 eye)
@@ -128,7 +156,7 @@ void ParticleHandler::draw(glm::mat4 camera, glm::mat4 world, double time, glm::
 	glUniformMatrix4fv(m_program->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(world));
 	glUniform4f(m_program->uniforms_location["eye"], eye.x, eye.y, eye.z, 1.0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_pos);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);

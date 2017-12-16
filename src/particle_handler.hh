@@ -26,7 +26,10 @@ public:
 	bool is_color_random();
 
 private:
-	GLuint m_vbo;
+	GLuint m_vbo_pos;
+	GLuint m_vbo_vel;
+	GLuint m_vbo_ttl;
+
 	GLuint m_max_part;
 	float m_ttl;
 	float m_dttl;
@@ -45,4 +48,5 @@ private:
 
 	ShaderHandler& m_shaders = ShaderHandler::instance();
 	std::shared_ptr<Program> m_program;
+	std::shared_ptr<Program> m_compute;
 };
