@@ -14,50 +14,22 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 	m_rand_colour = random_colour;
 	m_base_colour = base_colour;
 
-	m_part_pos.resize((m_max_part*3)*2);
+	m_part_pos.resize(m_max_part*3);
 	m_part_vel.resize(m_max_part*3);
 	m_part_ttl.resize(m_max_part, m_ttl);
 
 	// Position
 	for(GLuint n=0; n<m_max_part; ++n)
 	{
-		m_part_pos[n*3] = m_pstart.x;
-		m_part_pos[n*3+1] = m_pstart.y;
-		m_part_pos[n*3+2] = m_pstart.z;
-	}
-
-	// Colour
-	if(m_rand_colour)
-	{
-		for(GLuint n=0; n<(m_max_part*3); ++n)
-		{
-			m_part_pos[m_max_part*3+n] = std::abs(m_uniform(m_randgen));
-		}
-	}
-	else
-	{
-		GLuint offset = m_max_part*3;
-		for(GLuint n=0; n<m_max_part; ++n)
-		{
-			m_part_pos[offset+n*3] = m_base_colour.r;
-			m_part_pos[offset+n*3+1] = m_base_colour.g;
-			m_part_pos[offset+n*3+2] = m_base_colour.b;
-		}
+		m_part_pos[n * 3] = m_pstart.x;
+		m_part_pos[n * 3 + 1] = m_pstart.y;
+		m_part_pos[n * 3 + 2] = m_pstart.z;
 	}
 
 	// Velocity
-	for(GLuint n=0; n<m_part_vel.size(); ++n)
+	for (GLuint n = 0; n<m_part_vel.size(); ++n)
 	{
 		m_part_vel[n] = m_uniform(m_randgen);
-	}
-
-	// Time to live
-	if(m_dttl > 0)
-	{
-		for(GLuint n=0; n<m_part_ttl.size(); ++n)
-		{
-			m_part_ttl[n] += m_uniform(m_randgen) * m_dttl;
-		}
 	}
 
 	glGenBuffers(1, &m_vbo_pos);
@@ -158,13 +130,23 @@ void ParticleHandler::draw(glm::mat4 camera, glm::mat4 world, double time, glm::
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_pos);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_vel);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*) (long) (m_max_part*3*sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_ttl);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0);
+
 	glDrawArrays(GL_POINTS, 0, m_max_part);
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+
 	glUseProgram(0);
 }
 

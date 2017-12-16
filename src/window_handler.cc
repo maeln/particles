@@ -53,7 +53,7 @@ WindowHandler::WindowHandler()
 	m_frame_dt = 0.0;
 	m_prev_t = 0.0;
 
-	m_max_part = 10000;
+	m_max_part = 128*10;
 	m_particles = std::unique_ptr<ParticleHandler>(new ParticleHandler(m_max_part, 2.5, 1.0, glm::vec3(0.0, 0.5, 0.0), false, glm::vec3(41.0/255.0, 114.0/255.0, 200.0/255.0)));
 	m_vsync = true;
 
@@ -172,13 +172,12 @@ void WindowHandler::rendering_loop()
 
 		//m_particles->draw(m_perpective_matrix, m_camera->view(), glfwGetTime(), m_camera->eye());
 
+		m_particles->update_particules(m_frame_dt, 0.5);
 		m_particles->draw(m_perpective_matrix, m_camera->view(), glfwGetTime(), m_camera->eye());
 
 		glUseProgram(0);
 
 		// End of the loop stuff.
-		m_particles->update_particules(m_frame_dt, 0.5);
-
 		std::cout << std::fixed;
 		std::cout.precision(0);
 		std::cout << "\rfps: " << 1.0/m_frame_dt << " | Point drawed: " << m_max_part << " | colour: " << (m_particles->is_color_random() ?  "Random" : "Fixed") << "           ";

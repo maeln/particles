@@ -30,12 +30,14 @@ void main(void)
 	if(ttl - dt <= 0.0) 
 	{
 		positions[id] = vec3(0.0, 0.0, 0.0);
-		ttls[id] = 2.0;
+		ttls[id] = 2.5;
 	}
 	else 
 	{
-		positions[id] = pos + (vel * dt * speed);
+		positions[id] = pos + vel * dt;
 		ttls[id] = ttl - dt;
 	}
+	
+	velocities[id] = vel;
 }
 
