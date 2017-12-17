@@ -3,6 +3,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <cmath>
 
+#include <iostream>
+#include <iomanip>
+
 ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, bool random_colour, glm::vec3 base_colour)
 {
 	m_uniform = std::uniform_real_distribution<double>(-1.0, 1.0);
@@ -56,6 +59,8 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 	std::shared_ptr<Shader> compute_shader = m_shaders.create_shader(GL_COMPUTE_SHADER, "data/particle.cs");
 	std::vector<std::shared_ptr<Shader>> cs = { compute_shader };
 	m_compute = m_shaders.create_program(cs);
+
+	m_data = (float*)malloc(sizeof(float) * m_max_part * 3);
 }
 
 ParticleHandler::~ParticleHandler()
@@ -73,9 +78,23 @@ void ParticleHandler::update_particules(float dt, float speed_factor)
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_vbo_pos);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_vbo_vel);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_vbo_ttl);
-	glDispatchCompute(m_max_part / 128, 1, 1);
+	glDispatchCompute(m_max_part/128, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	glUseProgram(0);
+
+	// debug stuff
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_pos);
+	m_data = (float*) glMapBufferRange(GL_ARRAY_BUFFER, 0, m_max_part * sizeof(float) * 3, GL_MAP_READ_BIT);
+	std::setprecision(5);
+	std::cout.precision(5);
+	std::cout << "[--------------------------------------------" << std::endl;
+	for (GLuint i = 0; i < m_max_part; ++i) {
+		std::cout << " (" << m_data[i*3] << ", " << m_data[i*3+1] << ", " << m_data[i*3+2] << "; " << i << ")";
+		if (i % 4 == 0)
+			std::cout << std::endl;
+	}
+	std::cout << "--------------------------------------------]" << std::endl;
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	/*
 	for(GLuint n=0; n<m_part_vel.size(); ++n)

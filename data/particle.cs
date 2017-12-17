@@ -27,17 +27,18 @@ void main(void)
 	vec3 vel = velocities[id];
 	float ttl = ttls[id];
 	
-	if(ttl - dt <= 0.0) 
+	float nttl = ttl - dt;
+	vec3 npos = pos + vel * dt;
+	/*
+	if(nttl <= 0.0) 
 	{
-		positions[id] = vec3(0.0, 0.0, 0.0);
-		ttls[id] = 2.5;
+		npos = vec3(0.0, 0.0, 0.0);
+		nttl = 2.5;
 	}
-	else 
-	{
-		positions[id] = pos + vel * dt;
-		ttls[id] = ttl - dt;
-	}
+	*/
 	
+	positions[id] = vec3(float(id) / 128.0, 0, 0);
 	velocities[id] = vel;
+	ttls[id] = ttl;
 }
 

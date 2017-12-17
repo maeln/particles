@@ -53,7 +53,7 @@ WindowHandler::WindowHandler()
 	m_frame_dt = 0.0;
 	m_prev_t = 0.0;
 
-	m_max_part = 128*10;
+	m_max_part = 128*1;
 	m_particles = std::unique_ptr<ParticleHandler>(new ParticleHandler(m_max_part, 2.5, 1.0, glm::vec3(0.0, 0.5, 0.0), false, glm::vec3(41.0/255.0, 114.0/255.0, 200.0/255.0)));
 	m_vsync = true;
 
@@ -158,6 +158,7 @@ void WindowHandler::rendering_loop()
 			m_camera->process_mouse((float)mouse_dx, (float)mouse_dy, m_frame_dt);
 
 		// Render stuff here.
+		/*
 		glUseProgram(m_programs["plane"]->addr);
 		glUniformMatrix4fv(m_programs["plane"]->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
 		glUniformMatrix4fv(m_programs["plane"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(m_camera->view()));
@@ -169,7 +170,7 @@ void WindowHandler::rendering_loop()
 		glUniformMatrix4fv(m_programs["suzanne"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(m_camera->view()));
 		glUniform4f(m_programs["suzanne"]->uniforms_location["eye"], m_camera->eye().x, m_camera->eye().y, m_camera->eye().z, 1.0);
 		suzanne.draw();
-
+		*/
 		//m_particles->draw(m_perpective_matrix, m_camera->view(), glfwGetTime(), m_camera->eye());
 
 		m_particles->update_particules(m_frame_dt, 0.5);

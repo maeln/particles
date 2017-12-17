@@ -49,4 +49,6 @@ private:
 	ShaderHandler& m_shaders = ShaderHandler::instance();
 	std::shared_ptr<Program> m_program;
 	std::shared_ptr<Program> m_compute;
+
+	float* m_data;
 };
