@@ -1,7 +1,7 @@
 #version 330
 
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec3 velocity;
+layout(location = 0) in vec4 position;
+layout(location = 1) in vec4 velocity;
 layout(location = 2) in float ttl;
 
 uniform float time;
@@ -14,10 +14,8 @@ out float pttl;
 
 void main()
 {
-	vec4 adj_pos = vec4(position, 1.0);
-	vec4 cameraPos = world * adj_pos;
-	gl_Position = camera * cameraPos;
-	dist = distance(adj_pos, eye);
+	gl_Position = camera * world * vec4(position.xyz, 1.f);
+	dist = distance(position, eye);
 	gl_PointSize = 6.0/dist;
 	pttl = ttl;
 }

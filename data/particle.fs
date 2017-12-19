@@ -6,12 +6,6 @@ uniform float time;
 smooth in float dist;
 in float pttl;
 
-/*
-float map(float value, float inMin, float inMax, float outMin, float outMax) {
-  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
-}
-*/
-
 void main()
 {
 	if(dot(gl_PointCoord-0.5,gl_PointCoord-0.5)>0.25)

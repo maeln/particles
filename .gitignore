@@ -3,3 +3,6 @@ part
 libs/
 *.trace
 build/
+*.exe
+*.ilk
+*.pdb

@@ -17,22 +17,34 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 	m_rand_colour = random_colour;
 	m_base_colour = base_colour;
 
-	m_part_pos.resize(m_max_part*3);
-	m_part_vel.resize(m_max_part*3);
+	// Since the std140 memory layout will round to 16bytes anyway, we might as well use vec4 instead of vec3.
+	m_part_pos.resize(m_max_part*4);
+	m_part_vel.resize(m_max_part*4);
 	m_part_ttl.resize(m_max_part, m_ttl);
 
 	// Position
 	for(GLuint n=0; n<m_max_part; ++n)
 	{
-		m_part_pos[n * 3] = m_pstart.x;
-		m_part_pos[n * 3 + 1] = m_pstart.y;
-		m_part_pos[n * 3 + 2] = m_pstart.z;
+		m_part_pos[n * 4 + 0] = m_pstart.x;
+		m_part_pos[n * 4 + 1] = m_pstart.y;
+		m_part_pos[n * 4 + 2] = m_pstart.z;
+		m_part_pos[n * 4 + 3] = 1.f;
 	}
 
 	// Velocity
-	for (GLuint n = 0; n<m_part_vel.size(); ++n)
+	for (GLuint n = 0; n<m_max_part; ++n)
 	{
-		m_part_vel[n] = m_uniform(m_randgen);
+		m_part_vel[n * 4 + 0] = m_uniform(m_randgen);
+		m_part_vel[n * 4 + 1] = m_uniform(m_randgen);
+		m_part_vel[n * 4 + 2] = m_uniform(m_randgen);
+		m_part_vel[n * 4 + 3] = 1.f;
+	}
+
+	if (m_dttl != 0) {
+		std::uniform_real_distribution<double> unif = std::uniform_real_distribution<double>(-m_dttl, m_dttl);
+		for (GLuint n = 0; n < m_part_ttl.size(); ++n) {
+			m_part_ttl[n] = ttl_particule + unif(m_randgen);
+		}
 	}
 
 	glGenBuffers(1, &m_vbo_pos);
@@ -60,7 +72,8 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 	std::vector<std::shared_ptr<Shader>> cs = { compute_shader };
 	m_compute = m_shaders.create_program(cs);
 
-	m_data = (float*)malloc(sizeof(float) * m_max_part * 3);
+	// For debug.
+	//m_data = (float*)malloc(sizeof(float) * m_max_part * 3);
 }
 
 ParticleHandler::~ParticleHandler()
@@ -72,6 +85,7 @@ ParticleHandler::~ParticleHandler()
 
 void ParticleHandler::update_particules(float dt, float speed_factor)
 {
+	
 	glUseProgram(m_compute->addr);
 	glUniform1f(m_compute->uniforms_location["dt"], dt);
 	glUniform1f(m_compute->uniforms_location["speed"], speed_factor);
@@ -81,7 +95,8 @@ void ParticleHandler::update_particules(float dt, float speed_factor)
 	glDispatchCompute(m_max_part/128, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	glUseProgram(0);
-
+	
+	/*
 	// debug stuff
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_pos);
 	m_data = (float*) glMapBufferRange(GL_ARRAY_BUFFER, 0, m_max_part * sizeof(float) * 3, GL_MAP_READ_BIT);
@@ -95,47 +110,6 @@ void ParticleHandler::update_particules(float dt, float speed_factor)
 	}
 	std::cout << "--------------------------------------------]" << std::endl;
 	glUnmapBuffer(GL_ARRAY_BUFFER);
-
-	/*
-	for(GLuint n=0; n<m_part_vel.size(); ++n)
-	{
-		m_part_pos[n] += m_part_vel[n]*speed_factor*dt;
-	}
-
-	for(GLuint n=0; n<m_max_part; ++n)
-	{
-		m_part_ttl[n] -= dt;
-		if(m_part_ttl[n] <= 0) // Particle is dead. Reset pos & vel.
-		{
-			m_part_pos[n*3] = m_pstart.x;
-			m_part_pos[n*3+1] = m_pstart.y;
-			m_part_pos[n*3+2] = m_pstart.z;
-
-			m_part_vel[n*3] = m_uniform(m_randgen);
-			m_part_vel[n*3+1] = m_uniform(m_randgen);
-			m_part_vel[n*3+2] = m_uniform(m_randgen);
-
-			m_part_ttl[n] = m_ttl + m_uniform(m_randgen) * m_dttl;
-
-			GLuint offset = m_max_part*3;
-			if(m_rand_colour)
-			{
-				m_part_pos[offset+n*3] = std::abs(m_uniform(m_randgen));
-				m_part_pos[offset+n*3+1] = std::abs(m_uniform(m_randgen));
-				m_part_pos[offset+n*3+2] = std::abs(m_uniform(m_randgen));
-			}
-			else
-			{
-				m_part_pos[offset+n*3] = m_base_colour.r;
-				m_part_pos[offset+n*3+1] = m_base_colour.g;
-				m_part_pos[offset+n*3+2] = m_base_colour.b;
-			}
-		}
-	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float)*m_part_pos.size(), m_part_pos.data());
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	*/
 }
 
@@ -149,11 +123,11 @@ void ParticleHandler::draw(glm::mat4 camera, glm::mat4 world, double time, glm::
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_pos);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_vel);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_ttl);
 	glEnableVertexAttribArray(2);
