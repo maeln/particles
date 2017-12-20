@@ -54,7 +54,6 @@ private:
 
 	// Private vars.
 	GLFWwindow* m_window;
-	GLuint m_vao;
 	GLuint m_width;
 	GLuint m_height;
 	bool m_vsync;

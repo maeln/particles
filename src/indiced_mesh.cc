@@ -29,20 +29,26 @@ void IndicedMesh::upload_to_gpu()
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_i_vbo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*m_indices->size(), m_indices->data(), GL_STATIC_DRAW);
+
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(m_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, m_v_vbo);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, m_vpd, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_i_vbo);
+	glBindVertexArray(0);
 }
 
 void IndicedMesh::remove_from_gpu()
 {
 	glDeleteBuffers(1, &m_v_vbo);
 	glDeleteBuffers(1, &m_i_vbo);
+	glDeleteVertexArrays(1, &m_vao);
 }
 
 void IndicedMesh::draw()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, m_v_vbo);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, m_vpd, GL_FLOAT, GL_FALSE, 0, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_i_vbo);
+	glBindVertexArray(m_vao);
 	glDrawElements(m_mode, m_indices->size(), GL_UNSIGNED_INT, 0);
-	glDisableVertexAttribArray(0);
+	glBindVertexArray(0);
 }

@@ -26,6 +26,7 @@ private:
 	std::unique_ptr<std::vector<GLuint>> m_indices;
 	GLuint m_v_vbo;
 	GLuint m_i_vbo;
+	GLuint m_vao;
 	GLenum m_mode;
 	GLuint m_vpd;
 };

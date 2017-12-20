@@ -24,6 +24,7 @@ public:
 private:
 	std::unique_ptr<std::vector<float>> m_vertex;
 	GLuint m_v_vbo;
+	GLuint m_vao;
 	GLenum m_mode;
 	GLuint m_vpd;
 };

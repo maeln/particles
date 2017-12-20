@@ -74,6 +74,24 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 
 	// For debug.
 	//m_data = (float*)malloc(sizeof(float) * m_max_part * 3);
+
+	// VAO
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(m_vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_pos);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_vel);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_ttl);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0);
+
+	glBindVertexArray(0);
 }
 
 ParticleHandler::~ParticleHandler()
@@ -81,6 +99,7 @@ ParticleHandler::~ParticleHandler()
 	glDeleteBuffers(1, &m_vbo_pos);
 	glDeleteBuffers(1, &m_vbo_vel);
 	glDeleteBuffers(1, &m_vbo_ttl);
+	glDeleteVertexArrays(1, &m_vao);
 }
 
 void ParticleHandler::update_particules(float dt, float speed_factor)
@@ -121,19 +140,9 @@ void ParticleHandler::draw(glm::mat4 camera, glm::mat4 world, double time, glm::
 	glUniformMatrix4fv(m_program->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(world));
 	glUniform4f(m_program->uniforms_location["eye"], eye.x, eye.y, eye.z, 1.0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_pos);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_vel);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_ttl);
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0);
-
+	glBindVertexArray(m_vao);
 	glDrawArrays(GL_POINTS, 0, m_max_part);
+	glBindVertexArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDisableVertexAttribArray(0);

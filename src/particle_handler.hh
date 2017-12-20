@@ -29,6 +29,7 @@ private:
 	GLuint m_vbo_pos;
 	GLuint m_vbo_vel;
 	GLuint m_vbo_ttl;
+	GLuint m_vao;
 
 	GLuint m_max_part;
 	float m_ttl;
