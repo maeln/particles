@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.cs": "glsl",
+        "*.fs": "glsl",
+        "*.vs": "glsl",
+        "*.gs": "glsl"
+    }
+}

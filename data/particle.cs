@@ -28,7 +28,7 @@ void main(void)
 	float ttl = ttls[id];
 	
 	float nttl = ttl - dt;
-	vec4 npos = pos + vel * dt;
+	vec4 npos = pos + vec4(sin(vel.x), cos(vel.y), vel.zw)* dt;
 	
 	if(nttl <= 0.0) 
 	{
