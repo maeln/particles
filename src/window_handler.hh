@@ -66,8 +66,6 @@ private:
 
 	std::unique_ptr<Camera> m_camera;
 
-	glm::mat4 m_perpective_matrix;
-
 	GLuint m_max_part;
 	std::unique_ptr<ParticleHandler> m_particles;
 	ShaderHandler& m_shaders = ShaderHandler::instance();

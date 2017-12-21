@@ -57,7 +57,7 @@ WindowHandler::WindowHandler()
 	m_particles = std::unique_ptr<ParticleHandler>(new ParticleHandler(m_max_part, 2.5, 2.5, glm::vec3(0.0, 0.5, 0.0), false, glm::vec3(41.0/255.0, 114.0/255.0, 200.0/255.0)));
 	m_vsync = true;
 
-	m_camera = std::unique_ptr<Camera>(new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5f, 0.01f));
+	m_camera = std::unique_ptr<Camera>(new Camera(glm::vec4(0.f, 0.f, -1.f, 1.f), glm::vec4(0.f, 0.f, 1.f, 1.f), glm::vec4(0.f, 1.f, 0.f, 1.f), glm::radians(75.f), (float)m_width/(float)m_height, 0.1f, 10.f, 0.5f, 0.01f));
 }
 
 WindowHandler::~WindowHandler()
@@ -84,8 +84,6 @@ void WindowHandler::setup()
 
 	// VSync.
 	glfwSwapInterval(m_vsync ? 1 : 0);
-
-	m_perpective_matrix = glm::perspective(glm::radians(60.f), (float)m_width/(float)m_height, 0.1f, 10.f);
 
 	m_shader_cache["plane_vert"] = m_shaders.create_shader(GL_VERTEX_SHADER, "data/plane.vs");
 	m_shader_cache["plane_frag"] = m_shaders.create_shader(GL_FRAGMENT_SHADER, "data/plane.fs");

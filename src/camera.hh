@@ -5,10 +5,18 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
+struct CameraUBO {
+	glm::vec4 eye;
+	glm::vec4 target;
+	glm::vec4 up;
+	glm::mat4 view;
+	glm::mat4 camera;
+};
+
 class Camera
 {
 public:
-	Camera(glm::vec3 eye, glm::vec3 target, glm::vec3 up, float kspeed, float mspeed);
+	Camera(glm::vec4 eye, glm::vec4 target, glm::vec4 up, float fov, float ratio, float near, float far, float kspeed, float mspeed);
 	~Camera();
 
 	void process_mouse(float dx, float dy, float dt);
@@ -17,22 +25,19 @@ public:
 	void set_kspeed(float speed);
 	void set_mspeed(float speed);
 
-	glm::vec3 eye();
-	glm::vec3 target();
-	glm::vec3 up();
-
+	glm::vec4 eye();
+	glm::vec4 target();
+	glm::vec4 up();
 	glm::mat4 view();
 
 	float kspeed();
 	float mspeed();
 
 private:
-	glm::vec3 m_eye;
-	glm::vec3 m_target;
-	glm::vec3 m_up;
-	glm::vec3 m_kspeed;
+	glm::vec4 m_kspeed;
 	float m_mspeed;
-	glm::mat4 m_view;
+
+	CameraUBO m_ubo;
 
 	float m_hangle;
 	float m_vangle;

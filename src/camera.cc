@@ -4,18 +4,21 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/trigonometric.hpp>
 
-Camera::Camera(glm::vec3 eye, glm::vec3 target, glm::vec3 up, float kspeed, float mspeed)
+Camera::Camera(glm::vec4 eye, glm::vec4 target, glm::vec4 up, float fov, float ratio, float near, float far, float kspeed, float mspeed)
 {
-	m_eye = eye;
-	m_target = target;
-	m_up = up;
-	m_kspeed = glm::vec3(kspeed);
+	m_kspeed = glm::vec4(kspeed, kspeed, kspeed, 1.f);
 	m_mspeed = mspeed;
 
 	m_hangle = 0.f;
 	m_vangle = 0.f;
 
-	m_view = glm::lookAt(m_eye, m_eye+m_target, m_up);
+	m_ubo = {
+		eye,
+		target,
+		up,
+		glm::lookAt(glm::vec3(eye), glm::vec3(eye+target), glm::vec3(up)),
+		glm::perspective(glm::radians(60.f), ratio, near, far)
+	};
 }
 
 Camera::~Camera()
@@ -27,10 +30,11 @@ void Camera::process_mouse(float dx, float dy, float dt)
 	m_hangle += dx*m_mspeed;
 	m_vangle += dy*m_mspeed;
 
-	m_target = glm::vec3(
+	m_ubo.target = glm::vec4(
 	               glm::cos(m_vangle)*glm::sin(m_hangle),
 	               glm::sin(m_vangle),
-	               glm::cos(m_vangle)*glm::cos(m_hangle)
+	               glm::cos(m_vangle)*glm::cos(m_hangle),
+				   1.f
 	           );
 
 	glm::vec3 right = glm::vec3(
@@ -39,53 +43,53 @@ void Camera::process_mouse(float dx, float dy, float dt)
 	                      glm::cos(m_hangle - 3.14f/2.f)
 	                  );
 
-	m_up = glm::cross(right, m_target);
+	m_ubo.up = glm::vec4(glm::cross(right, glm::vec3(m_ubo.target)), 1.f);
 
-	m_view = glm::lookAt(m_eye, m_eye+m_target, m_up);
+	m_ubo.view = glm::lookAt(glm::vec3(m_ubo.eye), glm::vec3(m_ubo.eye+m_ubo.target), glm::vec3(m_ubo.up));
 }
 
 void Camera::process_key(int key, float dt)
 {
 	if(key == GLFW_KEY_W)
 	{
-		m_eye += (m_target * m_kspeed * glm::vec3(dt));
+		m_ubo.eye += (m_ubo.target * m_kspeed * glm::vec4(dt, dt, dt, 1.f));
 	}
 
 	if(key == GLFW_KEY_S)
 	{
-		m_eye -= (m_target * m_kspeed * glm::vec3(dt));
+		m_ubo.eye -= (m_ubo.target * m_kspeed * glm::vec4(dt, dt, dt, 1.f));
 	}
 
 	if(key == GLFW_KEY_A)
 	{
-		glm::vec3 left = glm::cross(m_up, m_target);
+		glm::vec3 left = glm::cross(glm::vec3(m_ubo.up), glm::vec3(m_ubo.target));
 		left = glm::normalize(left);
-		m_eye += (left * m_kspeed * glm::vec3(dt));
+		m_ubo.eye += (glm::vec4(left, 1.f) * m_kspeed * glm::vec4(dt, dt, dt, 1.f));
 	}
 
 	if(key == GLFW_KEY_D)
 	{
-		glm::vec3 left = glm::cross(m_target, m_up);
+		glm::vec3 left = glm::cross(glm::vec3(m_ubo.target), glm::vec3(m_ubo.up));
 		left = glm::normalize(left);
-		m_eye += (left * m_kspeed * glm::vec3(dt));
+		m_ubo.eye += (glm::vec4(left, 1.f) * m_kspeed * glm::vec4(dt, dt, dt, 1.f));
 	}
 
 	if(key == GLFW_KEY_SPACE)
 	{
-		m_eye += (glm::vec3(0.f, 1.f, 0.f) * m_kspeed * glm::vec3(dt));
+		m_ubo.eye += (glm::vec4(0.f, 1.f, 0.f, 0.f) * m_kspeed * glm::vec4(dt, dt, dt, 1.f));
 	}
 
 	if(key == GLFW_KEY_LEFT_SHIFT)
 	{
-		m_eye -= (glm::vec3(0.f, 1.f, 0.f) * m_kspeed * glm::vec3(dt));
+		m_ubo.eye -= (glm::vec4(0.f, 1.f, 0.f, 0.f) * m_kspeed * glm::vec4(dt, dt, dt, 1.f));
 	}
 
-	m_view = glm::lookAt(m_eye, m_eye+m_target, m_up);
+	m_ubo.view = glm::lookAt(glm::vec3(m_ubo.eye), glm::vec3(m_ubo.eye+m_ubo.target), glm::vec3(m_ubo.up));
 }
 
 void Camera::set_kspeed(float speed)
 {
-	m_kspeed = glm::vec3(speed);
+	m_kspeed = glm::vec4(speed);
 }
 
 void Camera::set_mspeed(float speed)
@@ -93,24 +97,24 @@ void Camera::set_mspeed(float speed)
 	m_mspeed = speed;
 }
 
-glm::vec3 Camera::eye()
+glm::vec4 Camera::eye()
 {
-	return m_eye;
+	return m_ubo.eye;
 }
 
-glm::vec3 Camera::target()
+glm::vec4 Camera::target()
 {
-	return m_target;
+	return m_ubo.target;
 }
 
-glm::vec3 Camera::up()
+glm::vec4 Camera::up()
 {
-	return m_up;
+	return m_ubo.up;
 }
 
 glm::mat4 Camera::view()
 {
-	return m_view;
+	return m_ubo.view;
 }
 
 float Camera::kspeed()
