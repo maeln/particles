@@ -7,6 +7,11 @@
 #include <memory>
 #include <iostream>
 
+/** TODO:
+ * I should implement something to parse shader so that I can handle UBO, uniform, buffer, etc. more
+ * easily.
+ */
+
 class Program
 {
 public:

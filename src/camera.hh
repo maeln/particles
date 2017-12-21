@@ -22,6 +22,9 @@ public:
 	void process_mouse(float dx, float dy, float dt);
 	void process_key(int key, float dt);
 
+	void update_buffer();
+	GLuint get_buffer();
+
 	void set_kspeed(float speed);
 	void set_mspeed(float speed);
 
@@ -38,6 +41,7 @@ private:
 	float m_mspeed;
 
 	CameraUBO m_ubo;
+	GLuint m_buffer;
 
 	float m_hangle;
 	float m_vangle;

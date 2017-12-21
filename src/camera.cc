@@ -4,6 +4,10 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/trigonometric.hpp>
 
+#include <GL/glew.h>
+
+#include <cstring>
+
 Camera::Camera(glm::vec4 eye, glm::vec4 target, glm::vec4 up, float fov, float ratio, float near, float far, float kspeed, float mspeed)
 {
 	m_kspeed = glm::vec4(kspeed, kspeed, kspeed, 1.f);
@@ -19,10 +23,29 @@ Camera::Camera(glm::vec4 eye, glm::vec4 target, glm::vec4 up, float fov, float r
 		glm::lookAt(glm::vec3(eye), glm::vec3(eye+target), glm::vec3(up)),
 		glm::perspective(glm::radians(60.f), ratio, near, far)
 	};
+
+	glGenBuffers(1, &m_buffer);
+	glBindBuffer(GL_UNIFORM_BUFFER, m_buffer);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(m_ubo), &m_ubo, GL_DYNAMIC_COPY);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 Camera::~Camera()
 {
+}
+
+void Camera::update_buffer()
+{
+	glBindBuffer(GL_UNIFORM_BUFFER, m_buffer);
+	GLvoid *p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
+	std::memcpy(p, &m_ubo, sizeof(m_ubo));
+	glUnmapBuffer(GL_UNIFORM_BUFFER);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+GLuint Camera::get_buffer()
+{
+	return m_buffer;
 }
 
 void Camera::process_mouse(float dx, float dy, float dt)

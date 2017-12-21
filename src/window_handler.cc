@@ -151,24 +151,20 @@ void WindowHandler::rendering_loop()
 		if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 			m_camera->process_mouse((float)mouse_dx, (float)mouse_dy, m_frame_dt);
 
+		m_camera->update_buffer();
+
 		// Render stuff here.
-		
 		glUseProgram(m_programs["plane"]->addr);
-		glUniformMatrix4fv(m_programs["plane"]->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
-		glUniformMatrix4fv(m_programs["plane"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(m_camera->view()));
-		plane.draw();
+		plane.draw(m_camera->get_buffer());
 		
 		glUseProgram(m_programs["suzanne"]->addr);
 		glUniform1f(m_programs["suzanne"]->uniforms_location["time"], glfwGetTime());
-		glUniformMatrix4fv(m_programs["suzanne"]->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
-		glUniformMatrix4fv(m_programs["suzanne"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(m_camera->view()));
-		glUniform4f(m_programs["suzanne"]->uniforms_location["eye"], m_camera->eye().x, m_camera->eye().y, m_camera->eye().z, 1.0);
-		suzanne.draw();
+		suzanne.draw(m_camera->get_buffer());
 		
 		//m_particles->draw(m_perpective_matrix, m_camera->view(), glfwGetTime(), m_camera->eye());
 
 		m_particles->update_particules(m_frame_dt, 0.5);
-		m_particles->draw(m_perpective_matrix, m_camera->view(), glfwGetTime(), m_camera->eye());
+		m_particles->draw(glfwGetTime(), m_camera->get_buffer());
 
 		glUseProgram(0);
 
