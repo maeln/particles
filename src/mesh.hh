@@ -18,7 +18,7 @@ public:
 	virtual void remove_from_gpu() = 0;
 
 	/**
-	 * Abstract function ton draw the mesh.
+	 * Abstract function to draw the mesh.
 	 * Should simply bind the VBO, set the vertex attribute arry / pointer
 	 * and call glDraw*.
 	 *
