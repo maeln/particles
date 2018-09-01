@@ -12,16 +12,16 @@ void main()
 {
 	vec4 center = world * gl_in[0].gl_Position;
 
-	gl_Position = camera *  (center + vec4(0.1, 0.1, 0.0, 0.0));
+	gl_Position = camera *  (center + vec4(0.01, 0.01, 0.0, 1.0));
 	EmitVertex();
 
-	gl_Position = camera *  (center + vec4(0.1, -0.1, 0.0, 0.0));
+	gl_Position = camera *  (center + vec4(0.01, -0.01, 0.0, 1.0));
 	EmitVertex();
 
-	gl_Position = camera *  (center + vec4(-0.1, 0.1, 0.0, 0.0));
+	gl_Position = camera *  (center + vec4(-0.01, 0.01, 0.0, 1.0));
 	EmitVertex();
 
-	gl_Position = camera * (center + vec4(-0.1, -0.1, 0.0, 0.0));
+	gl_Position = camera * (center + vec4(-0.01, -0.01, 0.0, 1.0));
 	EmitVertex();
 
 	EndPrimitive();
