@@ -14,8 +14,10 @@ out float pttl;
 
 void main()
 {
-	gl_Position = camera * world * vec4(position.xyz, 1.f);
+	gl_Position = position;
+	/*
 	dist = distance(position, eye);
-	gl_PointSize = 6.0/dist;
+	gl_PointSize = 10.0/dist;
 	pttl = ttl;
+	*/
 }
