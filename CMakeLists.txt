@@ -9,6 +9,7 @@ include_directories(
 	external/glfw-3.2.1/include/GLFW/
 	external/glm-0.9.8.5/glm/
 	external/glew-2.1.0/include/
+	external/stb_image/
 	.
 )
 

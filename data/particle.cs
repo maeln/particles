@@ -36,7 +36,7 @@ void main(void)
 	float ttl = ttls[id];
 
 	float nttl = ttl - dt;
-	vec4 npos = pos + vel * dt;
+	vec4 npos = vec4(pos.xyz + vel.xyz * dt, 1.0);
 	
 	if(nttl <= 0.0) 
 	{
