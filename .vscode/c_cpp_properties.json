@@ -56,7 +56,8 @@
                 "${workspaceRoot}",
                 "${workspaceRoot}/external/glm-0.9.8.5/glm",
                 "${workspaceRoot}/external/glfw-3.2.1/include",
-                "${workspaceRoot}/external/glew-2.1.0/include"
+                "${workspaceRoot}/external/glew-2.1.0/include",
+                "${workspaceFolder}/external/stb_image"
             ],
             "defines": [
                 "_DEBUG",

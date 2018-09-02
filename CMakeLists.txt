@@ -28,20 +28,15 @@ add_definitions(
 )
 
 FILE(GLOB_RECURSE HEADERS "src/*.hh")
+FILE(GLOB_RECURSE SOURCES "src/*.cc")
 FILE(GLOB_RECURSE SHADER_GEOM "data/*.gs")
 FILE(GLOB_RECURSE SHADER_VERT "data/*.vs")
 FILE(GLOB_RECURSE SHADER_FRAG "data/*.fs")
+
 source_group("Data" FILES ${SHADER_GEOM} ${SHADER_FRAG} ${SHADER_VERT})
 add_executable(
 	parts 
-	src/main.cc 
-	src/tools.cc 
-	src/shader_handler.cc 
-	src/window_handler.cc 
-	src/particle_handler.cc 
-	src/camera.cc 
-	src/indiced_mesh.cc 
-	src/basic_mesh.cc 
+	${SOURCES}
 	${HEADERS}
 	${SHADER_GEOM} 
 	${SHADER_FRAG} 

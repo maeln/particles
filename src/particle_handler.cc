@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <iostream>
 
+#include "image_handler.hh"
+
 ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, bool random_colour,
                                  glm::vec3 base_colour) {
     m_uniform = std::uniform_real_distribution<double>(-1.0, 1.0);
@@ -59,6 +61,10 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    // Texture
+    // float tex_coord[] = {0.0f, 0.1f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f};
+    m_texture = ImageHandler::load_texture("data/particle.png");
+
     // shaders.
     std::shared_ptr<Shader> geom_shader = m_shaders.create_shader(GL_GEOMETRY_SHADER, "data/particle.gs");
     std::shared_ptr<Shader> vertex_shader = m_shaders.create_shader(GL_VERTEX_SHADER, "data/particle.vs");
@@ -100,9 +106,10 @@ ParticleHandler::~ParticleHandler() {
     glDeleteVertexArrays(1, &m_vao);
 }
 
-void ParticleHandler::update_particules(float dt, float speed_factor) {
+void ParticleHandler::update_particules(float time, float dt, float speed_factor) {
 
     glUseProgram(m_compute->addr);
+    glUniform1f(m_compute->uniforms_location["time"], time);
     glUniform1f(m_compute->uniforms_location["dt"], dt);
     glUniform1f(m_compute->uniforms_location["speed"], speed_factor);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_vbo_pos);
@@ -134,7 +141,9 @@ void ParticleHandler::draw(glm::mat4 camera, glm::mat4 world, double time, glm::
     // Require back to front ordering.
     glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+    glBindTexture(GL_TEXTURE_2D, m_texture);
 
     glUseProgram(m_program->addr);
     glUniform1f(m_program->uniforms_location["time"], time);
