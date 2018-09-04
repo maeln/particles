@@ -19,14 +19,16 @@ float random(vec2 st) { return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43
 
 void main(void) {
     uint id = gl_GlobalInvocationID.x;
-    vec4 pos = positions[id];
-    vec4 grav = GRAVITY_DIRECTION * 0.2 * dt;
-    vec4 vortex = vec4(sin(time), 0.0, cos(time), 0.0) * dt;
-    vec4 vel = velocities[id] + grav + vortex;
     float ttl = ttls[id];
+    vec4 pos = positions[id];
+    vec4 grav = GRAVITY_DIRECTION * 0.00981;
+    vec4 vortex = vec4(sin(ttl * 18.0) * 0.6, time * 0.01, cos(ttl * 18.0) * 0.6, 0.0) * 0.2;
+    vec4 attraction = (vec4(0.0, 0.3, 0.0, 0.0) - pos) * 0.1;
+
+    vec4 vel = velocities[id] + grav + vortex + attraction;
 
     float nttl = ttl - dt;
-    vec4 npos = vec4(pos.xyz + velocities[id].xyz * dt + grav.xyz + vortex.xyz, 1.0);
+    vec4 npos = vec4(pos.xyz + vel.xyz * dt * 0.3, 1.0);
 
     if (nttl <= 0.0) {
 	npos = vec4(0.0, 0.0, 0.0, 1.0);

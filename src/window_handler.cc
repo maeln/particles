@@ -51,7 +51,7 @@ WindowHandler::WindowHandler() {
     m_frame_dt = 0.0;
     m_prev_t = 0.0;
 
-    m_max_part = 128 * 10000;
+    m_max_part = 128 * 10;
     m_particles = std::unique_ptr<ParticleHandler>(
         new ParticleHandler(m_max_part, 2.5, 2.5, glm::vec3(0.0, 0.5, 0.0), false, glm::vec3(41.0 / 255.0, 114.0 / 255.0, 200.0 / 255.0)));
     m_vsync = true;
