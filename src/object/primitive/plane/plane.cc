@@ -1,6 +1,5 @@
 #include "plane.hh"
 
-#include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
 
 Plane::Plane(std::shared_ptr<Program> program) {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <GL/glew.h>
+
 #include "src/graph/scene/scene_node.hh"
 #include "src/object/mesh/primitive/plane_mesh.hh"
 #include "src/shader_handler.hh"

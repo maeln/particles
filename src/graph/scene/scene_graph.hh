@@ -5,8 +5,8 @@
 
 class SceneGraph : public SceneNode {
   public:
-    SceneGraph();
-    ~SceneGraph();
+    SceneGraph() : SceneNode() {}
+    ~SceneGraph() {}
 
   private:
 };

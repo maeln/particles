@@ -9,5 +9,5 @@
  */
 class Drawable {
   public:
-    virtual void draw(std::shared_ptr<SceneContext>, glm::mat4x4);
+    virtual void draw(std::shared_ptr<SceneContext>, glm::mat4x4) = 0;
 };

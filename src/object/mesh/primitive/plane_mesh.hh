@@ -15,5 +15,5 @@ class PlaneMesh : public IndicedMesh {
               std::unique_ptr<std::vector<GLuint>>(new std::vector<GLuint>(plane_ind, plane_ind + sizeof(plane_ind) + sizeof(GLuint))),
               GL_TRIANGLES, 3) {}
 
-    ~PlaneMesh();
+    ~PlaneMesh() {}
 };

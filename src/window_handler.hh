@@ -1,8 +1,7 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
-
 #include <GL/glew.h>
+
 #include <glm/glm.hpp>
 #include <glm/mat4x4.hpp>
 #include <map>
@@ -13,6 +12,8 @@
 #include "src/graph/scene/scene_context.hh"
 #include "src/graph/scene/scene_graph.hh"
 #include "src/object/camera/camera.hh"
+
+#include <GLFW/glfw3.h>
 
 class WindowHandler {
   public:
