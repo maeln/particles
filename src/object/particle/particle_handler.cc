@@ -136,7 +136,10 @@ void ParticleHandler::update_particules(float time, float dt, float speed_factor
     */
 }
 
-void ParticleHandler::draw(glm::mat4 camera, glm::mat4 world, double time, glm::vec3 eye) {
+void ParticleHandler::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model) {
+    // Update position
+    update_particules(ctx->t_time, ctx->f_time);
+
     // Deactivate depth mask for higher performance.
     // Require back to front ordering.
     glDepthMask(GL_FALSE);
@@ -146,10 +149,13 @@ void ParticleHandler::draw(glm::mat4 camera, glm::mat4 world, double time, glm::
     glBindTexture(GL_TEXTURE_2D, m_texture);
 
     glUseProgram(m_program->addr);
-    glUniform1f(m_program->uniforms_location["time"], time);
-    glUniformMatrix4fv(m_program->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(camera));
-    glUniformMatrix4fv(m_program->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(world));
-    glUniform4f(m_program->uniforms_location["eye"], eye.x, eye.y, eye.z, 1.0);
+    glUniform1f(m_program->uniforms_location["time"], ctx->t_time);
+    glUniform1f(m_program->uniforms_location["dt"], ctx->f_time);
+    glUniformMatrix4fv(m_program->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(ctx->activeCamera->view()));
+    glUniformMatrix4fv(m_program->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(ctx->perspective));
+    glUniformMatrix4fv(m_program->uniforms_location["model"], 1, GL_FALSE, glm::value_ptr(model));
+    glUniform4f(m_program->uniforms_location["eye"], ctx->activeCamera->eye().x, ctx->activeCamera->eye().y, ctx->activeCamera->eye().z,
+                1.0);
 
     glBindVertexArray(m_vao);
     glDrawArrays(GL_POINTS, 0, m_max_part);

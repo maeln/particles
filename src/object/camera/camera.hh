@@ -5,9 +5,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
-#include "src/scene/node/positionable_node.hh"
-
-class Camera : public PositionableNode {
+class Camera {
   public:
     Camera(glm::vec3 eye, glm::vec3 target, glm::vec3 up, float kspeed, float mspeed);
     ~Camera();

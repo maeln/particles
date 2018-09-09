@@ -10,8 +10,9 @@
 #include <string>
 #include <vector>
 
-#include "data.hh"
-#include "mesh/indiced_mesh.hh"
+#include "src/object/particle/particle_handler.hh"
+#include "src/object/primitive/plane/plane.hh"
+
 #include "tools.hh"
 
 WindowHandler::WindowHandler() {
@@ -51,19 +52,16 @@ WindowHandler::WindowHandler() {
     m_frame_dt = 0.0;
     m_prev_t = 0.0;
 
-    m_max_part = 128 * 10000;
-    m_particles = std::unique_ptr<ParticleHandler>(
-        new ParticleHandler(m_max_part, 2.5, 2.5, glm::vec3(0.0, 0.5, 0.0), false, glm::vec3(41.0 / 255.0, 114.0 / 255.0, 200.0 / 255.0)));
-    m_vsync = true;
-
     m_camera =
-        std::unique_ptr<Camera>(new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5f, 0.01f));
+        std::shared_ptr<Camera>(new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5f, 0.01f));
+    m_ctx->activeCamera = m_camera;
+
+    m_vsync = true;
 }
 
 WindowHandler::~WindowHandler() {
     m_shader_cache.clear();
     m_programs.clear();
-    m_particles.reset();
     glfwTerminate();
 }
 
@@ -84,36 +82,29 @@ void WindowHandler::setup() {
     glfwSwapInterval(m_vsync ? 1 : 0);
 
     m_perpective_matrix = glm::perspective(glm::radians(60.f), (float)m_width / (float)m_height, 0.1f, 10.f);
+    m_ctx->perspective = m_perpective_matrix;
 
     m_shader_cache["plane_vert"] = m_shaders.create_shader(GL_VERTEX_SHADER, "data/plane.vs");
     m_shader_cache["plane_frag"] = m_shaders.create_shader(GL_FRAGMENT_SHADER, "data/plane.fs");
     std::vector<std::shared_ptr<Shader>> plane_shader = {m_shader_cache["plane_vert"], m_shader_cache["plane_frag"]};
     m_programs["plane"] = m_shaders.create_program(plane_shader);
-    /*
-    m_shader_cache["suzanne_vert"] = m_shaders.create_shader(GL_VERTEX_SHADER, "data/suzanne.vs");
-    m_shader_cache["suzanne_frag"] = m_shaders.create_shader(GL_FRAGMENT_SHADER, "data/suzanne.fs");
-    std::vector<std::shared_ptr<Shader>> suzanne_shader = {m_shader_cache["suzanne_vert"], m_shader_cache["suzanne_frag"]};
-    m_programs["suzanne"] = m_shaders.create_program(suzanne_shader);
-    */
+
+    m_max_part = 128 * 100;
+    std::shared_ptr<ParticleHandler> particles(
+        new ParticleHandler(m_max_part, 2.5, 2.5, glm::vec3(0.0, 0.5, 0.0), false, glm::vec3(41.0 / 255.0, 114.0 / 255.0, 200.0 / 255.0)));
+
+    std::shared_ptr<Plane> plane(new Plane(m_programs["plane"]));
+
+    /* Set up the scene */
+    m_scene.add_child(particles);
+    m_scene.add_child(plane);
 }
 
 void WindowHandler::rendering_loop() {
-    IndicedMesh plane(
-        std::unique_ptr<std::vector<float>>(new std::vector<float>(plane_vert, plane_vert + sizeof(plane_vert) / sizeof(float))),
-        std::unique_ptr<std::vector<GLuint>>(new std::vector<GLuint>(plane_ind, plane_ind + sizeof(plane_ind) + sizeof(GLuint))),
-        GL_TRIANGLES, 3);
-    plane.upload_to_gpu();
-
     // dirty - Mixup with reference and std::unique_ptr.
     std::unique_ptr<std::vector<float>> svert(new std::vector<float>());
     std::unique_ptr<std::vector<float>> snorm(new std::vector<float>());
     std::unique_ptr<std::vector<GLuint>> sind(new std::vector<GLuint>());
-
-    /*
-    load_obj("data/text.obj", svert.get(), sind.get(), snorm.get());
-    IndicedMesh suzanne(std::move(svert), std::move(sind), GL_POINTS, 3);
-    suzanne.upload_to_gpu();
-    */
 
     double mouse_x, mouse_y;
     glfwGetCursorPos(m_window, &mouse_x, &mouse_y);
@@ -154,33 +145,14 @@ void WindowHandler::rendering_loop() {
 	    m_camera->process_mouse((float)mouse_dx, (float)mouse_dy, m_frame_dt);
 
 	// Render stuff here.
-
-	glUseProgram(m_programs["plane"]->addr);
-	glUniformMatrix4fv(m_programs["plane"]->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
-	glUniformMatrix4fv(m_programs["plane"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(m_camera->view()));
-	plane.draw();
-
-	/*
-	    glUseProgram(m_programs["suzanne"]->addr);
-	    glUniform1f(m_programs["suzanne"]->uniforms_location["time"], glfwGetTime());
-	    glUniformMatrix4fv(m_programs["suzanne"]->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(m_perpective_matrix));
-	    glUniformMatrix4fv(m_programs["suzanne"]->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(m_camera->view()));
-	    glUniform4f(m_programs["suzanne"]->uniforms_location["eye"], m_camera->eye().x, m_camera->eye().y, m_camera->eye().z, 1.0);
-	    suzanne.draw();
-	*/
-
-	// m_particles->draw(m_perpective_matrix, m_camera->view(), glfwGetTime(), m_camera->eye());
-
-	m_particles->update_particules(glfwGetTime(), m_frame_dt, 0.5);
-	m_particles->draw(m_perpective_matrix, m_camera->view(), glfwGetTime(), m_camera->eye());
+	m_scene.draw(m_ctx, glm::mat4());
 
 	glUseProgram(0);
 
 	// End of the loop stuff.
 	std::cout << std::fixed;
 	std::cout.precision(0);
-	std::cout << "\rfps: " << 1.0 / m_frame_dt << " | Point drawed: " << m_max_part
-	          << " | colour: " << (m_particles->is_color_random() ? "Random" : "Fixed") << "           ";
+	std::cout << "\rfps: " << 1.0 / m_frame_dt << " | Point drawed: " << m_max_part;
 
 	// Swapping buffers & polling events.
 	glfwSwapBuffers(m_window);
@@ -205,15 +177,9 @@ void WindowHandler::keyboard_callback(GLFWwindow *window, int key, int scancode,
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 	glfwSetWindowShouldClose(window, GLFW_TRUE);
 
-    // m_camera->process_key(key, m_frame_dt);
-
     if (key == GLFW_KEY_V && action == GLFW_PRESS) {
 	m_vsync = !m_vsync;
 	glfwSwapInterval(m_vsync ? 1 : 0);
-    }
-
-    if (key == GLFW_KEY_N && action == GLFW_PRESS) {
-	m_particles->set_random_colour(!m_particles->is_color_random());
     }
 }
 

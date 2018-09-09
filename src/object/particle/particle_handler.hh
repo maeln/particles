@@ -7,17 +7,17 @@
 #include <random>
 #include <vector>
 
-#include "shader_handler.hh"
-#include "src/scene/node/drawable_node.hh"
+#include "src/graph/scene/scene_node.hh"
+#include "src/shader_handler.hh"
 
-class ParticleHandler : public DrawableNode {
+class ParticleHandler : public SceneNode {
   public:
     ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, bool random_colour,
                     glm::vec3 base_colour);
     ~ParticleHandler();
 
     void update_particules(float time, float dt, float speed_factor = 1.f);
-    void draw(glm::mat4 camera, glm::mat4 world, double time, glm::vec3 eye);
+    void draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model);
 
     void set_colour(glm::vec3 col);
     void set_random_colour(bool r);
