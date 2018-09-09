@@ -1,6 +1,5 @@
 #version 330
 
-uniform float time;
 uniform sampler2D texture;
 
 in vec2 tex_coord;

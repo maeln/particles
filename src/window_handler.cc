@@ -52,6 +52,8 @@ WindowHandler::WindowHandler() {
     m_frame_dt = 0.0;
     m_prev_t = 0.0;
 
+    m_ctx = std::shared_ptr<SceneContext>(new SceneContext());
+
     m_camera =
         std::shared_ptr<Camera>(new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5f, 0.01f));
     m_ctx->activeCamera = m_camera;
@@ -89,15 +91,15 @@ void WindowHandler::setup() {
     std::vector<std::shared_ptr<Shader>> plane_shader = {m_shader_cache["plane_vert"], m_shader_cache["plane_frag"]};
     m_programs["plane"] = m_shaders.create_program(plane_shader);
 
-    m_max_part = 128 * 100;
+    m_max_part = 128 * 10;
     std::shared_ptr<ParticleHandler> particles(
         new ParticleHandler(m_max_part, 2.5, 2.5, glm::vec3(0.0, 0.5, 0.0), false, glm::vec3(41.0 / 255.0, 114.0 / 255.0, 200.0 / 255.0)));
 
     std::shared_ptr<Plane> plane(new Plane(m_programs["plane"]));
 
     /* Set up the scene */
-    m_scene.add_child(particles);
     m_scene.add_child(plane);
+    // m_scene.add_child(particles);
 }
 
 void WindowHandler::rendering_loop() {
@@ -144,6 +146,9 @@ void WindowHandler::rendering_loop() {
 	if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	    m_camera->process_mouse((float)mouse_dx, (float)mouse_dy, m_frame_dt);
 
+	m_ctx->t_time = glfwGetTime();
+	m_ctx->f_time = m_frame_dt;
+
 	// Render stuff here.
 	m_scene.draw(m_ctx, glm::mat4());
 
@@ -167,6 +172,7 @@ void WindowHandler::resize_callback(GLFWwindow *window, int width, int height) {
     m_height = height;
     glViewport(0, 0, width, height);
     m_perpective_matrix = glm::perspective(glm::radians(60.f), (float)m_width / (float)m_height, 0.1f, 10.f);
+    m_ctx->perspective = m_perpective_matrix;
 }
 
 void WindowHandler::error_callback(int error, const char *description) {

@@ -6,8 +6,10 @@
 
 class SceneContext {
   public:
+    SceneContext() {}
+    ~SceneContext() {}
     std::shared_ptr<Camera> activeCamera;
-    glm::mat4x4 perspective;
+    glm::mat4 perspective;
     double t_time;
     double f_time;
 };

@@ -58,6 +58,7 @@ class WindowHandler {
     std::shared_ptr<Camera> m_camera;
     glm::mat4 m_perpective_matrix;
     SceneGraph m_scene;
+
     std::shared_ptr<SceneContext> m_ctx;
 
     GLuint m_max_part;
