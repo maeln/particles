@@ -8,11 +8,9 @@
 #include <vector>
 
 #include "shader_handler.hh"
+#include "src/scene/node/drawable_node.hh"
 
-// TODO: Use Transform Feedback to move the particles instead of
-// doing it on the CPU.
-
-class ParticleHandler {
+class ParticleHandler : public DrawableNode {
   public:
     ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, bool random_colour,
                     glm::vec3 base_colour);

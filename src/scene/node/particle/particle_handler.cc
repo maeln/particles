@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include "image_handler.hh"
+#include "src/image_handler.hh"
 
 ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, bool random_colour,
                                  glm::vec3 base_colour) {
