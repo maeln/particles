@@ -17,3 +17,7 @@ To Do:
 - Add BVH/Frustrum culling
 - Implement Radix-sorting with compute shader
 - Implement a shader processing facility 
+  - Add #include support
+  - Add a raymarching facility
+  - Same for Pathtracing
+  - Auto load uniform ?
