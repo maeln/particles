@@ -7,6 +7,11 @@ To Do:
 - Add render target to drawable
 - Add live reload of shaders 
 - Implement post-processing facility
+  - HDR
+  - Bloom
+  - Bokeh DoF
+  - Lens distortion w/ chromatic aberation
+  - Glitch
 - Use ImGUI and allow runtime editing of most variables
 - Use UBO
 - Add BVH/Frustrum culling
