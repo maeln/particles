@@ -151,8 +151,8 @@ void ParticleHandler::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model)
     glUseProgram(m_program->addr);
     glUniform1f(m_program->uniforms_location["time"], ctx->t_time);
     glUniform1f(m_program->uniforms_location["dt"], ctx->f_time);
-    glUniformMatrix4fv(m_program->uniforms_location["camera"], 1, GL_FALSE, glm::value_ptr(ctx->activeCamera->view()));
-    glUniformMatrix4fv(m_program->uniforms_location["world"], 1, GL_FALSE, glm::value_ptr(ctx->perspective));
+    glUniformMatrix4fv(m_program->uniforms_location["view"], 1, GL_FALSE, glm::value_ptr(ctx->activeCamera->view()));
+    glUniformMatrix4fv(m_program->uniforms_location["projection"], 1, GL_FALSE, glm::value_ptr(ctx->perspective));
     glUniformMatrix4fv(m_program->uniforms_location["model"], 1, GL_FALSE, glm::value_ptr(model));
     glUniform4f(m_program->uniforms_location["eye"], ctx->activeCamera->eye().x, ctx->activeCamera->eye().y, ctx->activeCamera->eye().z,
                 1.0);

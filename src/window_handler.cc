@@ -91,7 +91,7 @@ void WindowHandler::setup() {
     std::vector<std::shared_ptr<Shader>> plane_shader = {m_shader_cache["plane_vert"], m_shader_cache["plane_frag"]};
     m_programs["plane"] = m_shaders.create_program(plane_shader);
 
-    m_max_part = 128 * 10;
+    m_max_part = 128 * 100;
     std::shared_ptr<ParticleHandler> particles(
         new ParticleHandler(m_max_part, 2.5, 2.5, glm::vec3(0.0, 0.5, 0.0), false, glm::vec3(41.0 / 255.0, 114.0 / 255.0, 200.0 / 255.0)));
 
@@ -99,7 +99,7 @@ void WindowHandler::setup() {
 
     /* Set up the scene */
     m_scene.add_child(plane);
-    // m_scene.add_child(particles);
+    m_scene.add_child(particles);
 }
 
 void WindowHandler::rendering_loop() {

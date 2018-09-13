@@ -25,15 +25,15 @@ void main(void) {
     vec4 vortex = vec4(sin(ttl * 18.0) * 0.6, time * 0.01, cos(ttl * 18.0) * 0.6, 0.0) * 0.2;
     vec4 attraction = (vec4(0.0, 0.3, 0.0, 0.0) - pos) * 0.1;
 
-    vec4 vel = velocities[id] + grav + vortex + attraction;
+    vec4 vel = normalize(velocities[id] + grav + vortex + attraction);
 
     float nttl = ttl - dt;
-    vec4 npos = vec4(pos.xyz + vel.xyz * dt * 0.3, 1.0);
+    vec4 npos = vec4(pos.xyz + vel.xyz * dt, 1.0);
 
     if (nttl <= 0.0) {
 	npos = vec4(0.0, 0.0, 0.0, 1.0);
 	nttl = 2.5;
-	vel = vec4(random(vel.yx) - random(vel.xy), random(vel.yz), random(vel.zx) - random(vel.xz), 1.0);
+	vel = normalize(vec4(random(vel.yx) - random(vel.xy), random(vel.yz), random(vel.zx) - random(vel.xz), 1.0));
     }
 
     // positions[id] = vec3(float(id) / 128.0, 0, 0);
