@@ -61,11 +61,7 @@ WindowHandler::WindowHandler() {
     m_vsync = true;
 }
 
-WindowHandler::~WindowHandler() {
-    m_shader_cache.clear();
-    m_programs.clear();
-    glfwTerminate();
-}
+WindowHandler::~WindowHandler() { glfwTerminate(); }
 
 void WindowHandler::setup() {
     // OpenGL stuff
@@ -86,20 +82,17 @@ void WindowHandler::setup() {
     m_perpective_matrix = glm::perspective(glm::radians(60.f), (float)m_width / (float)m_height, 0.1f, 10.f);
     m_ctx->perspective = m_perpective_matrix;
 
-    m_shader_cache["plane_vert"] = m_shaders.create_shader(GL_VERTEX_SHADER, "data/plane.vs");
-    m_shader_cache["plane_frag"] = m_shaders.create_shader(GL_FRAGMENT_SHADER, "data/plane.fs");
-    std::vector<std::shared_ptr<Shader>> plane_shader = {m_shader_cache["plane_vert"], m_shader_cache["plane_frag"]};
-    m_programs["plane"] = m_shaders.create_program(plane_shader);
-
     m_max_part = 128 * 100;
     std::shared_ptr<ParticleHandler> particles(
         new ParticleHandler(m_max_part, 2.5, 2.5, glm::vec3(0.0, 0.5, 0.0), false, glm::vec3(41.0 / 255.0, 114.0 / 255.0, 200.0 / 255.0)));
 
-    std::shared_ptr<Plane> plane(new Plane(m_programs["plane"]));
+    std::shared_ptr<Plane> plane(new Plane());
 
     /* Set up the scene */
     m_scene.add_child(plane);
     m_scene.add_child(particles);
+
+    m_dt_acc = 0.0;
 }
 
 void WindowHandler::rendering_loop() {
@@ -164,6 +157,11 @@ void WindowHandler::rendering_loop() {
 	glfwPollEvents();
 
 	m_frame_dt = glfwGetTime() - m_prev_t;
+	m_dt_acc += m_frame_dt;
+	if (m_dt_acc > 1.0) {
+	    m_shaderdb.check_reload();
+	    m_dt_acc = 0.0;
+	}
     }
 }
 

@@ -66,19 +66,8 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
     m_texture = ImageHandler::load_texture("data/particle.png");
 
     // shaders.
-    std::shared_ptr<Shader> geom_shader = m_shaders.create_shader(GL_GEOMETRY_SHADER, "data/particle.gs");
-    std::shared_ptr<Shader> vertex_shader = m_shaders.create_shader(GL_VERTEX_SHADER, "data/particle.vs");
-    std::shared_ptr<Shader> pixel_shader = m_shaders.create_shader(GL_FRAGMENT_SHADER, "data/particle.fs");
-    std::vector<std::shared_ptr<Shader>> ps = {geom_shader, vertex_shader, pixel_shader};
-    m_program = m_shaders.create_program(ps);
-
-    // Compute shader.
-    std::shared_ptr<Shader> compute_shader = m_shaders.create_shader(GL_COMPUTE_SHADER, "data/particle.cs");
-    std::vector<std::shared_ptr<Shader>> cs = {compute_shader};
-    m_compute = m_shaders.create_program(cs);
-
-    // For debug.
-    // m_data = (float*)malloc(sizeof(float) * m_max_part * 3);
+    m_visual_program = m_shaderdb.load_program({"data/particle.gs", "data/particle.vs", "data/particle.fs"});
+    m_compute_program = m_shaderdb.load_program({"data/particle.cs"});
 
     // VAO
     glGenVertexArrays(1, &m_vao);
@@ -107,33 +96,17 @@ ParticleHandler::~ParticleHandler() {
 }
 
 void ParticleHandler::update_particules(float time, float dt, float speed_factor) {
-
-    glUseProgram(m_compute->addr);
-    glUniform1f(m_compute->uniforms_location["time"], time);
-    glUniform1f(m_compute->uniforms_location["dt"], dt);
-    glUniform1f(m_compute->uniforms_location["speed"], speed_factor);
+    Program program = m_shaderdb.get_program(m_compute_program);
+    glUseProgram(program.addr);
+    glUniform1f(program.uniforms_location["time"], time);
+    glUniform1f(program.uniforms_location["dt"], dt);
+    glUniform1f(program.uniforms_location["speed"], speed_factor);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_vbo_pos);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_vbo_vel);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_vbo_ttl);
     glDispatchCompute(m_max_part / 128, 1, 1);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
     glUseProgram(0);
-
-    /*
-    // debug stuff
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo_pos);
-    m_data = (float*) glMapBufferRange(GL_ARRAY_BUFFER, 0, m_max_part * sizeof(float) * 3, GL_MAP_READ_BIT);
-    std::setprecision(5);
-    std::cout.precision(5);
-    std::cout << "[--------------------------------------------" << std::endl;
-    for (GLuint i = 0; i < m_max_part; ++i) {
-            std::cout << " (" << m_data[i*3] << ", " << m_data[i*3+1] << ", " << m_data[i*3+2] << "; " << i << ")";
-            if (i % 4 == 0)
-                    std::cout << std::endl;
-    }
-    std::cout << "--------------------------------------------]" << std::endl;
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-    */
 }
 
 void ParticleHandler::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model) {
@@ -148,17 +121,17 @@ void ParticleHandler::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model)
 
     glBindTexture(GL_TEXTURE_2D, m_texture);
 
-    glUseProgram(m_program->addr);
-    glUniform1f(m_program->uniforms_location["time"], ctx->t_time);
-    glUniform1f(m_program->uniforms_location["dt"], ctx->f_time);
+    Program program = m_shaderdb.get_program(m_visual_program);
+    glUseProgram(program.addr);
+    glUniform1f(program.uniforms_location["time"], ctx->t_time);
+    glUniform1f(program.uniforms_location["dt"], ctx->f_time);
 
-    glUniform4f(m_program->uniforms_location["part_colour"], m_base_colour.r, m_base_colour.g, m_base_colour.b, 1.0);
-    glUniform4f(m_program->uniforms_location["eye"], ctx->activeCamera->eye().x, ctx->activeCamera->eye().y, ctx->activeCamera->eye().z,
-                1.0);
+    glUniform4f(program.uniforms_location["part_colour"], m_base_colour.r, m_base_colour.g, m_base_colour.b, 1.0);
+    glUniform4f(program.uniforms_location["eye"], ctx->activeCamera->eye().x, ctx->activeCamera->eye().y, ctx->activeCamera->eye().z, 1.0);
 
-    glUniformMatrix4fv(m_program->uniforms_location["view"], 1, GL_FALSE, glm::value_ptr(ctx->activeCamera->view()));
-    glUniformMatrix4fv(m_program->uniforms_location["projection"], 1, GL_FALSE, glm::value_ptr(ctx->perspective));
-    glUniformMatrix4fv(m_program->uniforms_location["model"], 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(program.uniforms_location["view"], 1, GL_FALSE, glm::value_ptr(ctx->activeCamera->view()));
+    glUniformMatrix4fv(program.uniforms_location["projection"], 1, GL_FALSE, glm::value_ptr(ctx->perspective));
+    glUniformMatrix4fv(program.uniforms_location["model"], 1, GL_FALSE, glm::value_ptr(model));
 
     glBindVertexArray(m_vao);
     glDrawArrays(GL_POINTS, 0, m_max_part);

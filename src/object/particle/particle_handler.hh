@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "src/graph/scene/scene_node.hh"
-#include "src/shader_handler.hh"
+#include "src/shaders/shaderdb.hh"
 
 class ParticleHandler : public SceneNode {
   public:
@@ -45,9 +45,9 @@ class ParticleHandler : public SceneNode {
     std::vector<float> m_part_vel;
     std::vector<float> m_part_ttl;
 
-    ShaderHandler &m_shaders = ShaderHandler::instance();
-    std::shared_ptr<Program> m_program;
-    std::shared_ptr<Program> m_compute;
+    ShaderDB &m_shaderdb = ShaderDB::instance();
+    GLuint m_visual_program;
+    GLuint m_compute_program;
 
     float *m_data;
 };

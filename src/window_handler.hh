@@ -8,10 +8,10 @@
 #include <memory>
 #include <string>
 
-#include "shader_handler.hh"
 #include "src/graph/scene/scene_context.hh"
 #include "src/graph/scene/scene_graph.hh"
 #include "src/object/camera/camera.hh"
+#include "src/shaders/shaderdb.hh"
 
 #include <GLFW/glfw3.h>
 
@@ -53,7 +53,10 @@ class WindowHandler {
     double m_mouse_dy;
 
     double m_frame_dt;
+    double m_dt_acc;
     double m_prev_t;
+
+    ShaderDB &m_shaderdb = ShaderDB::instance();
 
     std::shared_ptr<Camera> m_camera;
     glm::mat4 m_perpective_matrix;
@@ -62,7 +65,4 @@ class WindowHandler {
     std::shared_ptr<SceneContext> m_ctx;
 
     GLuint m_max_part;
-    ShaderHandler &m_shaders = ShaderHandler::instance();
-    std::map<std::string, std::shared_ptr<Shader>> m_shader_cache;
-    std::map<std::string, std::shared_ptr<Program>> m_programs;
 };
