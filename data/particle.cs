@@ -21,11 +21,11 @@ void main(void) {
     uint id = gl_GlobalInvocationID.x;
     float ttl = ttls[id];
     vec4 pos = positions[id];
-    vec4 grav = GRAVITY_DIRECTION * 0.00981;
-    vec4 vortex = vec4(sin(ttl * 18.0) * 0.6, time * 0.01, cos(ttl * 18.0) * 0.6, 0.0) * 0.2;
-    vec4 attraction = (vec4(0.0, 0.3, 0.0, 0.0) - pos) * 0.1;
+    vec4 grav = GRAVITY_DIRECTION * 0.0981 * dt;
+    vec4 vortex = vec4(sin(ttl * 18.0) * 0.6, time * 0.01, cos(ttl * 18.0) * 0.6, 0.0) * dt;
+    vec4 attraction = (vec4(0.0, 0.3, 0.0, 0.0) - pos) * dt;
 
-    vec4 vel = normalize(velocities[id] + grav + vortex + attraction);
+    vec4 vel = normalize(velocities[id] + grav + attraction + vortex);
 
     float nttl = ttl - dt;
     vec4 npos = vec4(pos.xyz + vel.xyz * dt, 1.0);
@@ -36,7 +36,6 @@ void main(void) {
 	vel = normalize(vec4(random(vel.yx) - random(vel.xy), random(vel.yz), random(vel.zx) - random(vel.xz), 1.0));
     }
 
-    // positions[id] = vec3(float(id) / 128.0, 0, 0);
     positions[id] = npos;
     velocities[id] = vel;
     ttls[id] = nttl;

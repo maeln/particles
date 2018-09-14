@@ -43,7 +43,6 @@ class ParticleHandler : public SceneNode {
 
     std::vector<float> m_part_pos;
     std::vector<float> m_part_vel;
-    std::vector<float> m_colour;
     std::vector<float> m_part_ttl;
 
     ShaderHandler &m_shaders = ShaderHandler::instance();
