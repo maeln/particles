@@ -7,6 +7,7 @@
 #include <glm/trigonometric.hpp>
 #include <glm/vec4.hpp>
 #include <iostream>
+#include <math.h>
 #include <string>
 #include <vector>
 
@@ -49,8 +50,6 @@ WindowHandler::WindowHandler() {
 
     m_mouse_dx = 0.0;
     m_mouse_dy = 0.0;
-    m_frame_dt = 0.0;
-    m_prev_t = 0.0;
 
     m_ctx = std::shared_ptr<SceneContext>(new SceneContext());
 
@@ -93,20 +92,17 @@ void WindowHandler::setup() {
     m_scene.add_child(particles);
 
     m_dt_acc = 0.0;
+    m_frame_dt = 0.0;
+    m_shader_reload_counter = 0.0;
 }
 
 void WindowHandler::rendering_loop() {
-    // dirty - Mixup with reference and std::unique_ptr.
-    std::unique_ptr<std::vector<float>> svert(new std::vector<float>());
-    std::unique_ptr<std::vector<float>> snorm(new std::vector<float>());
-    std::unique_ptr<std::vector<GLuint>> sind(new std::vector<GLuint>());
-
     double mouse_x, mouse_y;
     glfwGetCursorPos(m_window, &mouse_x, &mouse_y);
     double mouse_dx = 0.0;
     double mouse_dy = 0.0;
     while (!glfwWindowShouldClose(m_window)) {
-	m_prev_t = glfwGetTime();
+	double start = glfwGetTime();
 
 	// Clean Window.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -139,7 +135,7 @@ void WindowHandler::rendering_loop() {
 	if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	    m_camera->process_mouse((float)mouse_dx, (float)mouse_dy, m_frame_dt);
 
-	m_ctx->t_time = glfwGetTime();
+	m_ctx->t_time = m_dt_acc;
 	m_ctx->f_time = m_frame_dt;
 
 	// Render stuff here.
@@ -154,14 +150,18 @@ void WindowHandler::rendering_loop() {
 
 	// Swapping buffers & polling events.
 	glfwSwapBuffers(m_window);
-	glfwPollEvents();
 
-	m_frame_dt = glfwGetTime() - m_prev_t;
-	m_dt_acc += m_frame_dt;
-	if (m_dt_acc > 1.0) {
+	if (m_shader_reload_counter > 1.0) {
 	    m_shaderdb.check_reload();
-	    m_dt_acc = 0.0;
+	    m_shader_reload_counter = 0.0;
 	}
+
+	double end = glfwGetTime();
+	m_frame_dt = end - start;
+	m_dt_acc += m_frame_dt;
+	m_shader_reload_counter += m_frame_dt;
+
+	glfwPollEvents();
     }
 }
 

@@ -54,7 +54,7 @@ class WindowHandler {
 
     double m_frame_dt;
     double m_dt_acc;
-    double m_prev_t;
+    double m_shader_reload_counter;
 
     ShaderDB &m_shaderdb = ShaderDB::instance();
 
