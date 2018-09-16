@@ -12,4 +12,6 @@ class SceneContext {
     glm::mat4 perspective;
     double t_time;
     double f_time;
+    double v_width;
+    double v_height;
 };

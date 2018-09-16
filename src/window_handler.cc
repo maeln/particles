@@ -53,6 +53,8 @@ WindowHandler::WindowHandler() {
     m_mouse_dy = 0.0;
 
     m_ctx = std::shared_ptr<SceneContext>(new SceneContext());
+    m_ctx->v_width = m_width;
+    m_ctx->v_height = m_height;
 
     m_camera =
         std::shared_ptr<Camera>(new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5f, 0.01f));
@@ -178,6 +180,8 @@ void WindowHandler::resize_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
     m_perpective_matrix = glm::perspective(glm::radians(60.f), (float)m_width / (float)m_height, 0.1f, 10.f);
     m_ctx->perspective = m_perpective_matrix;
+    m_ctx->v_width = m_width;
+    m_ctx->v_height = m_height;
 }
 
 void WindowHandler::error_callback(int error, const char *description) {

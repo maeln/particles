@@ -12,5 +12,6 @@ void FSQuad::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model) {
     glUseProgram(program.addr);
     glUniform1f(program.uniforms_location["time"], ctx->t_time);
     glUniform1f(program.uniforms_location["dt"], ctx->f_time);
+    glUniform2f(program.uniforms_location["resolution"], ctx->v_width, ctx->v_height);
     m_mesh.draw();
 };
