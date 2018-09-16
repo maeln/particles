@@ -182,6 +182,7 @@ void WindowHandler::resize_callback(GLFWwindow *window, int width, int height) {
     m_ctx->perspective = m_perpective_matrix;
     m_ctx->v_width = m_width;
     m_ctx->v_height = m_height;
+    m_fb_handler.resize_framebuffer(m_scene_fbo, m_width, m_height);
 }
 
 void WindowHandler::error_callback(int error, const char *description) {

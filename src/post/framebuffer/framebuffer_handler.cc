@@ -4,7 +4,15 @@
 
 Framebuffer FramebufferHandler::get_framebuffer(GLuint handler) { return m_fbs.at(handler); }
 
-GLuint FramebufferHandler::create_full_framebuffer(double width, double height) {
+GLuint FramebufferHandler::create_full_framebuffer(double width, double height) { return create_framebuffer(width, height, 0); }
+
+void FramebufferHandler::resize_framebuffer(GLuint handler, double width, double height) {
+    GLuint addr = get_framebuffer(handler).addr;
+    glDeleteFramebuffers(1, &addr);
+    create_framebuffer(width, height, handler);
+}
+
+GLuint FramebufferHandler::create_framebuffer(double width, double height, GLuint handler) {
     GLuint fbo;
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -36,7 +44,12 @@ GLuint FramebufferHandler::create_full_framebuffer(double width, double height) 
     Framebuffer fb(m_fb_count, fbo);
     fb.color = color_buffer;
     fb.depth_stencil = rbo;
-    m_fb_count += 1;
+
+    if (handler != 0) {
+	fb.handler = handler;
+    } else {
+	m_fb_count += 1;
+    }
 
     m_fbs[fb.handler] = fb;
     return fb.handler;

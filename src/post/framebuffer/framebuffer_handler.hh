@@ -37,6 +37,7 @@ class FramebufferHandler {
     };
 
     Framebuffer get_framebuffer(GLuint handler);
+    void resize_framebuffer(GLuint handler, double width, double height);
 
     /** Create a "full" framebuffer (With depth, stencil and color attachement) */
     GLuint create_full_framebuffer(double width, double height);
@@ -45,6 +46,8 @@ class FramebufferHandler {
     FramebufferHandler() { m_fb_count = 1; }; // 0 is reserved;
     FramebufferHandler(const FramebufferHandler &);
     void operator=(const FramebufferHandler &);
+
+    GLuint create_framebuffer(double width, double height, GLuint handler);
 
     GLuint m_fb_count;
     std::map<GLuint, Framebuffer> m_fbs;
