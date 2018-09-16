@@ -57,10 +57,14 @@ class WindowHandler {
     double m_shader_reload_counter;
 
     ShaderDB &m_shaderdb = ShaderDB::instance();
+    FramebufferHandler &m_fb_handler = FramebufferHandler::instance();
 
     std::shared_ptr<Camera> m_camera;
     glm::mat4 m_perpective_matrix;
+
     SceneGraph m_scene;
+    GLuint m_scene_fbo;
+    SceneGraph m_fs_scene;
 
     std::shared_ptr<SceneContext> m_ctx;
 

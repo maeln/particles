@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "src/object/particle/particle_handler.hh"
+#include "src/object/primitive/fs_quad/fs_quad.hh"
 #include "src/object/primitive/plane/plane.hh"
 
 #include "tools.hh"
@@ -57,6 +58,9 @@ WindowHandler::WindowHandler() {
         std::shared_ptr<Camera>(new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5f, 0.01f));
     m_ctx->activeCamera = m_camera;
 
+    m_scene_fbo = m_fb_handler.create_full_framebuffer(m_width, m_height);
+    m_scene.set_fbo(m_scene_fbo);
+
     m_vsync = true;
 }
 
@@ -91,6 +95,9 @@ void WindowHandler::setup() {
     m_scene.add_child(plane);
     m_scene.add_child(particles);
 
+    /* Set up the fs quad */
+    m_fs_scene.add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/post/post.fs")));
+
     m_dt_acc = 0.0;
     m_frame_dt = 0.0;
     m_shader_reload_counter = 0.0;
@@ -103,10 +110,6 @@ void WindowHandler::rendering_loop() {
     double mouse_dy = 0.0;
     while (!glfwWindowShouldClose(m_window)) {
 	double start = glfwGetTime();
-
-	// Clean Window.
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glClearColor(0.f, 0.f, 0.f, 0.f);
 
 	if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
 	    m_camera->process_key(GLFW_KEY_W, m_frame_dt);
@@ -140,6 +143,10 @@ void WindowHandler::rendering_loop() {
 
 	// Render stuff here.
 	m_scene.draw(m_ctx, glm::mat4());
+
+	// Render the framebuffer
+	glBindTexture(GL_TEXTURE_2D, m_fb_handler.get_framebuffer(m_scene_fbo).color);
+	m_fs_scene.draw(m_ctx, glm::mat4());
 
 	glUseProgram(0);
 
