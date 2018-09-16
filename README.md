@@ -21,4 +21,4 @@ To Do:
   - Add a raymarching facility
   - Same for Pathtracing
   - Auto load uniform ?
-- Add easy_fft + midi input
+- [ ] Add easy_fft + midi input
