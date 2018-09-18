@@ -15,6 +15,11 @@
 #include "src/object/primitive/fs_quad/fs_quad.hh"
 #include "src/object/primitive/plane/plane.hh"
 
+// ImGUI Stuff
+#include "src/imgui/imgui.h"
+#include "src/imgui/imgui_impl_glfw.h"
+#include "src/imgui/imgui_impl_opengl3.h"
+
 #include "tools.hh"
 
 WindowHandler::WindowHandler() {
@@ -49,6 +54,13 @@ WindowHandler::WindowHandler() {
     glewInit();
     glViewport(0, 0, m_width, m_height);
 
+    // Setup ImGui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(m_window, true);
+    ImGui_ImplOpenGL3_Init("#version 330 core");
+    ImGui::StyleColorsDark();
+
     m_mouse_dx = 0.0;
     m_mouse_dy = 0.0;
 
@@ -66,7 +78,12 @@ WindowHandler::WindowHandler() {
     m_vsync = true;
 }
 
-WindowHandler::~WindowHandler() { glfwTerminate(); }
+WindowHandler::~WindowHandler() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+    glfwTerminate();
+}
 
 void WindowHandler::setup() {
     // OpenGL stuff
@@ -111,7 +128,21 @@ void WindowHandler::rendering_loop() {
     glfwGetCursorPos(m_window, &mouse_x, &mouse_y);
     double mouse_dx = 0.0;
     double mouse_dy = 0.0;
+
     while (!glfwWindowShouldClose(m_window)) {
+	glfwPollEvents();
+
+	// GUI:
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::Begin("Run info");
+
+	ImGui::Text("Frame time: %f ms", m_frame_dt * 1000.0);
+
+	ImGui::End();
+
 	double start = glfwGetTime();
 
 	if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
@@ -131,6 +162,14 @@ void WindowHandler::rendering_loop() {
 
 	if (glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	    m_camera->process_key(GLFW_KEY_LEFT_SHIFT, m_frame_dt);
+
+	if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	    glfwSetWindowShouldClose(m_window, GLFW_TRUE);
+
+	if (glfwGetKey(m_window, GLFW_KEY_V) == GLFW_PRESS) {
+	    m_vsync = !m_vsync;
+	    glfwSwapInterval(m_vsync ? 1 : 0);
+	}
 
 	mouse_dx = mouse_x;
 	mouse_dy = mouse_y;
@@ -153,12 +192,15 @@ void WindowHandler::rendering_loop() {
 
 	glUseProgram(0);
 
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 	// End of the loop stuff.
 	std::cout << std::fixed;
 	std::cout.precision(0);
 	std::cout << "\rfps: " << 1.0 / m_frame_dt << " | Point drawed: " << m_max_part;
 
-	// Swapping buffers & polling events.
+	// Swapping buffers
 	glfwSwapBuffers(m_window);
 
 	if (m_shader_reload_counter > 1.0) {
@@ -170,8 +212,6 @@ void WindowHandler::rendering_loop() {
 	m_frame_dt = end - start;
 	m_dt_acc += m_frame_dt;
 	m_shader_reload_counter += m_frame_dt;
-
-	glfwPollEvents();
     }
 }
 
@@ -190,14 +230,6 @@ void WindowHandler::error_callback(int error, const char *description) {
     std::cerr << "GLFW Error (code: " << error << "): " << description << std::endl;
 }
 
-void WindowHandler::keyboard_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-	glfwSetWindowShouldClose(window, GLFW_TRUE);
-
-    if (key == GLFW_KEY_V && action == GLFW_PRESS) {
-	m_vsync = !m_vsync;
-	glfwSwapInterval(m_vsync ? 1 : 0);
-    }
-}
+void WindowHandler::keyboard_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {}
 
 void WindowHandler::mouse_callback(GLFWwindow *window, double xpos, double ypos) {}
