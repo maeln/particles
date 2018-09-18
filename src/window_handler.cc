@@ -92,6 +92,7 @@ void WindowHandler::setup() {
         new ParticleHandler(m_max_part, 2.5, 2.5, glm::vec3(0.0, 0.5, 0.0), false, glm::vec3(41.0 / 255.0, 114.0 / 255.0, 200.0 / 255.0)));
 
     std::shared_ptr<Plane> plane(new Plane());
+    plane->translate(glm::vec3(0.0, -0.5, 0.0));
 
     /* Set up the scene */
     m_scene.add_child(plane);

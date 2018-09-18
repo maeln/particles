@@ -2,7 +2,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-FSQuad::FSQuad(std::string fs) {
+FSQuad::FSQuad(std::string fs) : SceneNode("fs_quad") {
     m_program = m_shaderdb.load_program({"data/shaders/post/post.vs", fs});
     m_mesh.upload_to_gpu();
 }

@@ -1,10 +1,26 @@
 #include "scene_node.hh"
 
-SceneNode::SceneNode() { m_parent = nullptr; }
+#include <glm/gtc/matrix_transform.hpp>
 
-SceneNode::SceneNode(std::shared_ptr<SceneNode> parent) { m_parent = parent; }
+SceneNode::SceneNode() {
+    m_name = "";
+    m_parent = nullptr;
+}
+
+SceneNode::SceneNode(std::string name) {
+    m_name = name;
+    m_parent = nullptr;
+}
+
+SceneNode::SceneNode(std::string name, std::shared_ptr<SceneNode> parent) {
+    m_name = name;
+    m_parent = parent;
+}
 
 SceneNode::~SceneNode() {}
+
+void SceneNode::set_name(std::string name) { m_name = name; }
+std::string SceneNode::get_name() { return m_name; }
 
 std::shared_ptr<SceneNode> SceneNode::parent() { return m_parent; }
 
@@ -25,24 +41,13 @@ void SceneNode::rm_child(std::shared_ptr<SceneNode> node) {
     m_childs.erase(m_childs.begin() + pos);
 }
 
-glm::mat4x4 SceneNode::transformation() {
-    glm::mat4x4 identity = glm::mat4x4();
-    for (size_t i = 0; i < m_mat_stack.size(); i++) {
-	identity *= m_mat_stack[i];
-    }
-    return identity;
-}
+glm::mat4x4 SceneNode::transformation() { return m_transformation; }
 
-void SceneNode::push_transformation(glm::mat4x4 m) { m_mat_stack.push_back(m); }
+void SceneNode::rotate(float angle, glm::vec3 axis) { m_transformation = glm::rotate(m_transformation, angle, axis); }
 
-glm::mat4x4 SceneNode::pop_transformation() {
-    if (m_mat_stack.size() == 0) {
-	return glm::mat4x4();
-    }
-    glm::mat4x4 transfo = m_mat_stack.front();
-    m_mat_stack.erase(m_mat_stack.begin());
-    return transfo;
-}
+void SceneNode::scale(glm::vec3 factors) { m_transformation = glm::scale(m_transformation, factors); }
+
+void SceneNode::translate(glm::vec3 factors) { m_transformation = glm::translate(m_transformation, factors); }
 
 void SceneNode::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 transfo) {
     glm::mat4x4 final_transfo = transfo * transformation();

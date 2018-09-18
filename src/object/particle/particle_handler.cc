@@ -9,7 +9,8 @@
 #include "src/image_handler.hh"
 
 ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, bool random_colour,
-                                 glm::vec3 base_colour) {
+                                 glm::vec3 base_colour)
+    : SceneNode("particules") {
     m_uniform = std::uniform_real_distribution<double>(-1.0, 1.0);
     m_max_part = nb_particule;
     m_ttl = ttl_particule;
@@ -110,6 +111,8 @@ void ParticleHandler::update_particules(float time, float dt, float speed_factor
 }
 
 void ParticleHandler::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model) {
+    glm::mat4 parts_model = model * transformation();
+
     // Update position
     update_particules(ctx->t_time, ctx->f_time);
 
@@ -131,7 +134,7 @@ void ParticleHandler::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model)
 
     glUniformMatrix4fv(program.uniforms_location["view"], 1, GL_FALSE, glm::value_ptr(ctx->activeCamera->view()));
     glUniformMatrix4fv(program.uniforms_location["projection"], 1, GL_FALSE, glm::value_ptr(ctx->perspective));
-    glUniformMatrix4fv(program.uniforms_location["model"], 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(program.uniforms_location["model"], 1, GL_FALSE, glm::value_ptr(parts_model));
 
     glBindVertexArray(m_vao);
     glDrawArrays(GL_POINTS, 0, m_max_part);
@@ -145,6 +148,8 @@ void ParticleHandler::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model)
     glUseProgram(0);
     glDisable(GL_BLEND);
     glDepthMask(GL_TRUE);
+
+    SceneNode::draw(ctx, parts_model);
 }
 
 void ParticleHandler::set_colour(glm::vec3 col) { m_base_colour = col; }
