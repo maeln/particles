@@ -8,8 +8,7 @@
 
 #include "src/image_handler.hh"
 
-ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, bool random_colour,
-                                 glm::vec3 base_colour)
+ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, glm::vec3 base_colour)
     : SceneNode("particules") {
     m_uniform = std::uniform_real_distribution<double>(-1.0, 1.0);
     m_max_part = nb_particule;
@@ -17,7 +16,6 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
     m_dttl = delta_ttl;
     m_pstart = start_point;
 
-    m_rand_colour = random_colour;
     m_base_colour = base_colour;
 
     // Since the std140 memory layout will round to 16bytes anyway, we might as well use vec4 instead of vec3.
@@ -153,7 +151,4 @@ void ParticleHandler::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model)
 }
 
 void ParticleHandler::set_colour(glm::vec3 col) { m_base_colour = col; }
-
-void ParticleHandler::set_random_colour(bool r) { m_rand_colour = r; }
-
-bool ParticleHandler::is_color_random() { return m_rand_colour; }
+glm::vec3 ParticleHandler::get_colour() { return m_base_colour; }

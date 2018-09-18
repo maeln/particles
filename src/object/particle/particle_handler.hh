@@ -12,16 +12,14 @@
 
 class ParticleHandler : public SceneNode {
   public:
-    ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, bool random_colour,
-                    glm::vec3 base_colour);
+    ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, glm::vec3 base_colour);
     ~ParticleHandler();
 
     void update_particules(float time, float dt, float speed_factor = 1.f);
     void draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model);
 
     void set_colour(glm::vec3 col);
-    void set_random_colour(bool r);
-    bool is_color_random();
+    glm::vec3 get_colour();
 
   private:
     GLuint m_vbo_pos;
@@ -35,7 +33,6 @@ class ParticleHandler : public SceneNode {
     glm::vec3 m_pstart;
     GLuint m_texture;
 
-    bool m_rand_colour;
     glm::vec3 m_base_colour;
 
     std::default_random_engine m_randgen;

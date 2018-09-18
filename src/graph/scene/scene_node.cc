@@ -41,6 +41,23 @@ void SceneNode::rm_child(std::shared_ptr<SceneNode> node) {
     m_childs.erase(m_childs.begin() + pos);
 }
 
+std::shared_ptr<SceneNode> SceneNode::find_node(std::string name) {
+    // Look a first level child first
+    for (auto node : m_childs) {
+	if (node->get_name() == name)
+	    return node;
+    }
+
+    // If we didn't find, we do a recursive find
+    for (auto node : m_childs) {
+	std::shared_ptr<SceneNode> res = node->find_node(name);
+	if (res != nullptr)
+	    return res;
+    }
+
+    return nullptr;
+}
+
 glm::mat4x4 SceneNode::transformation() { return m_transformation; }
 
 void SceneNode::rotate(float angle, glm::vec3 axis) { m_transformation = glm::rotate(m_transformation, angle, axis); }

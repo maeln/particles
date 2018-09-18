@@ -106,10 +106,12 @@ void WindowHandler::setup() {
 
     m_max_part = 128 * 100;
     std::shared_ptr<ParticleHandler> particles(
-        new ParticleHandler(m_max_part, 2.5, 2.5, glm::vec3(0.0, 0.5, 0.0), false, glm::vec3(41.0 / 255.0, 114.0 / 255.0, 200.0 / 255.0)));
+        new ParticleHandler(m_max_part, 2.0, 2.0, glm::vec3(0.0, 0.0, 0.0), glm::vec3(41.0 / 255.0, 114.0 / 255.0, 200.0 / 255.0)));
+    particles->set_name("parts1");
 
     std::shared_ptr<Plane> plane(new Plane());
     plane->translate(glm::vec3(0.0, -0.5, 0.0));
+    plane->set_name("plane1");
 
     /* Set up the scene */
     m_scene.add_child(plane);
@@ -133,13 +135,25 @@ void WindowHandler::rendering_loop() {
 	glfwPollEvents();
 
 	// GUI:
+	std::shared_ptr<ParticleHandler> parts1 = std::dynamic_pointer_cast<ParticleHandler>(m_scene.find_node("parts1"));
+	glm::vec3 parts_color = parts1->get_colour();
+	float col[3] = {parts_color.r, parts_color.g, parts_color.b};
+
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
 	ImGui::Begin("Run info");
 
-	ImGui::Text("Frame time: %f ms", m_frame_dt * 1000.0);
+	bool changed = ImGui::Checkbox("VSync", &m_vsync);
+	if (changed)
+	    glfwSwapInterval(m_vsync ? 1 : 0);
+
+	ImGui::Text("dt  : %.2fms", m_frame_dt * 1000.0);
+	ImGui::Text("fps : %.2f", 1.0 / m_frame_dt);
+
+	ImGui::ColorEdit3("Parts colour", col);
+	parts1->set_colour(glm::vec3(col[0], col[1], col[2]));
 
 	ImGui::End();
 
@@ -166,11 +180,6 @@ void WindowHandler::rendering_loop() {
 	if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	    glfwSetWindowShouldClose(m_window, GLFW_TRUE);
 
-	if (glfwGetKey(m_window, GLFW_KEY_V) == GLFW_PRESS) {
-	    m_vsync = !m_vsync;
-	    glfwSwapInterval(m_vsync ? 1 : 0);
-	}
-
 	mouse_dx = mouse_x;
 	mouse_dy = mouse_y;
 	glfwGetCursorPos(m_window, &mouse_x, &mouse_y);
@@ -195,11 +204,6 @@ void WindowHandler::rendering_loop() {
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	// End of the loop stuff.
-	std::cout << std::fixed;
-	std::cout.precision(0);
-	std::cout << "\rfps: " << 1.0 / m_frame_dt << " | Point drawed: " << m_max_part;
 
 	// Swapping buffers
 	glfwSwapBuffers(m_window);
