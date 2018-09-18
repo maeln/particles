@@ -177,7 +177,8 @@ void WindowHandler::rendering_loop() {
 	mouse_dx -= mouse_x;
 	mouse_dy -= mouse_y;
 
-	if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	ImGuiIO &io = ImGui::GetIO();
+	if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !io.WantCaptureMouse)
 	    m_camera->process_mouse((float)mouse_dx, (float)mouse_dy, m_frame_dt);
 
 	m_ctx->t_time = m_dt_acc;
