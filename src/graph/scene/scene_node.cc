@@ -31,8 +31,8 @@ void SceneNode::change_parent(std::shared_ptr<SceneNode> node) { m_parent = node
 void SceneNode::add_child(std::shared_ptr<SceneNode> node) { m_childs.push_back(node); }
 
 void SceneNode::rm_child(std::shared_ptr<SceneNode> node) {
-    int pos = -1;
-    for (int i = 0; i < m_childs.size(); i++) {
+    uint32_t pos = -1;
+    for (uint32_t i = 0; i < m_childs.size(); i++) {
 	if (m_childs.at(i) == node) {
 	    pos = i;
 	    break;

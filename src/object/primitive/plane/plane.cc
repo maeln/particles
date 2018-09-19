@@ -3,7 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 Plane::Plane() : SceneNode("plane") {
-    m_program = m_shaderdb.load_program({"data/plane.vs", "data/plane.fs"});
+    m_program = m_shaderdb.load_program({"data/shaders/plane/plane.vs", "data/shaders/plane/plane.fs"});
     m_mesh.upload_to_gpu();
 }
 

@@ -36,7 +36,7 @@ class ParticleHandler : public SceneNode {
     glm::vec3 m_base_colour;
 
     std::default_random_engine m_randgen;
-    std::uniform_real_distribution<double> m_uniform;
+    std::uniform_real_distribution<float> m_uniform;
 
     std::vector<float> m_part_pos;
     std::vector<float> m_part_vel;

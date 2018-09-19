@@ -11,7 +11,7 @@
 ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, glm::vec3 base_colour)
     : SceneNode("particules") {
     m_compute_supported = glewIsSupported("GL_ARB_compute_shader");
-    m_uniform = std::uniform_real_distribution<double>(-1.0, 1.0);
+    m_uniform = std::uniform_real_distribution<float>(-1.0, 1.0);
     m_max_part = nb_particule;
     m_ttl = ttl_particule;
     m_dttl = delta_ttl;
@@ -72,11 +72,12 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 
     // Texture
     // float tex_coord[] = {0.0f, 0.1f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f};
-    m_texture = ImageHandler::load_texture("data/particle.png");
+    m_texture = ImageHandler::load_texture("data/images/particle.png");
 
     // shaders.
-    m_visual_program = m_shaderdb.load_program({"data/particle.gs", "data/particle.vs", "data/particle.fs"});
-    m_compute_program = m_shaderdb.load_program({"data/particle.cs"});
+    m_visual_program = m_shaderdb.load_program(
+        {"data/shaders/particle/particle.gs", "data/shaders/particle/particle.vs", "data/shaders/particle/particle.fs"});
+    m_compute_program = m_shaderdb.load_program({"data/shaders/particle/particle.cs"});
 
     // VAO
     glGenVertexArrays(1, &m_vao);
