@@ -1,6 +1,7 @@
 #include "window_handler.hh"
 
 #include <algorithm>
+#include <chrono>
 #include <exception>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -163,7 +164,7 @@ void WindowHandler::rendering_loop() {
 
 	ImGui::End();
 
-	double start = glfwGetTime();
+	auto start = std::chrono::system_clock::now();
 
 	if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
 	    m_camera->process_key(GLFW_KEY_W, m_frame_dt);
@@ -219,8 +220,10 @@ void WindowHandler::rendering_loop() {
 	    m_shader_reload_counter = 0.0;
 	}
 
-	double end = glfwGetTime();
-	m_frame_dt = end - start;
+	auto end = std::chrono::system_clock::now();
+	std::chrono::duration<double> elapsed = end - start;
+
+	m_frame_dt = elapsed.count();
 	m_dt_acc += m_frame_dt;
 	m_shader_reload_counter += m_frame_dt;
     }
