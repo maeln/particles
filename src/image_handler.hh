@@ -4,9 +4,9 @@
 #include <string>
 
 class ImageHandler {
-  public:
-    ImageHandler();
-    ~ImageHandler();
+public:
+	ImageHandler();
+	~ImageHandler();
 
-    static GLuint load_texture(std::string filename);
+	static GLuint load_texture(std::string filename);
 };

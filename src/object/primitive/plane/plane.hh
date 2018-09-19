@@ -9,14 +9,14 @@
 #include <vector>
 
 class Plane : public SceneNode {
-  public:
-    Plane();
-    ~Plane();
+public:
+	Plane();
+	~Plane();
 
-    void draw(std::shared_ptr<SceneContext>, glm::mat4x4);
+	void draw(std::shared_ptr<SceneContext>, glm::mat4x4);
 
-  private:
-    PlaneMesh m_mesh;
-    ShaderDB &m_shaderdb = ShaderDB::instance();
-    GLuint m_program;
+private:
+	PlaneMesh m_mesh;
+	ShaderDB& m_shaderdb = ShaderDB::instance();
+	GLuint m_program;
 };

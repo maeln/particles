@@ -13,14 +13,14 @@
  * A full screen quad.
  */
 class FSQuad : public SceneNode {
-  public:
-    FSQuad(std::string fs);
-    ~FSQuad(){};
+public:
+	FSQuad(std::string fs);
+	~FSQuad(){};
 
-    void draw(std::shared_ptr<SceneContext>, glm::mat4x4);
+	void draw(std::shared_ptr<SceneContext>, glm::mat4x4);
 
-  private:
-    QuadMesh m_mesh;
-    ShaderDB &m_shaderdb = ShaderDB::instance();
-    GLuint m_program;
+private:
+	QuadMesh m_mesh;
+	ShaderDB& m_shaderdb = ShaderDB::instance();
+	GLuint m_program;
 };

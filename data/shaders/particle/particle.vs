@@ -9,15 +9,17 @@ uniform mat4 camera;
 uniform mat4 world;
 uniform vec4 eye;
 
-out FS {
-    out float dist;
-    out float ttl;
+out FS
+{
+	out float dist;
+	out float ttl;
 }
 fs;
 
-void main() {
-    gl_Position = position;
-    fs.ttl = ttl;
-    fs.dist = distance(position, eye);
-    // fs.tex_coord = tex_coord;
+void main()
+{
+	gl_Position = position;
+	fs.ttl = ttl;
+	fs.dist = distance(position, eye);
+	// fs.tex_coord = tex_coord;
 }

@@ -5,13 +5,13 @@
 #include <memory>
 
 class SceneContext {
-  public:
-    SceneContext() {}
-    ~SceneContext() {}
-    std::shared_ptr<Camera> activeCamera;
-    glm::mat4 perspective;
-    double t_time;
-    double f_time;
-    double v_width;
-    double v_height;
+public:
+	SceneContext() {}
+	~SceneContext() {}
+	std::shared_ptr<Camera> activeCamera;
+	glm::mat4 perspective;
+	double t_time;
+	double f_time;
+	double v_width;
+	double v_height;
 };

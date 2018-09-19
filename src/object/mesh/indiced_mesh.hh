@@ -1,8 +1,8 @@
 #pragma once
 
 #include <GL/glew.h>
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "mesh.hh"
 
@@ -10,8 +10,7 @@
  * Represent a Mesh that use indiced drawing.
  * The Mesh will have a vertex buffer and an indice buffer.
  */
-class IndicedMesh : public Mesh
-{
+class IndicedMesh : public Mesh {
 public:
 	IndicedMesh(std::unique_ptr<std::vector<float>> vertex, std::unique_ptr<std::vector<GLuint>> indices, GLenum render_mode, GLuint nb_vert_per_draw);
 	~IndicedMesh();

@@ -6,6 +6,6 @@ out vec4 color;
 
 void main()
 {
-    color = interpol;
-    //color = vec4(1.0, 0.0, 0.0, 1.0);
+	color = interpol;
+	//color = vec4(1.0, 0.0, 0.0, 1.0);
 }

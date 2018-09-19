@@ -3,8 +3,7 @@
 #include <GL/glew.h>
 
 /* Generic Mesh interface */
-class Mesh
-{
+class Mesh {
 public:
 	/**
 	 * Put the data of the mesh inside a VBO to be ready for drawing.
