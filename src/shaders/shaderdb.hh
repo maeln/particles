@@ -4,16 +4,9 @@
 #include <exception>
 #include <initializer_list>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
-
-class ShaderLoadingException : public std::exception {
-    const char *what() const throw() { return "Shader Loading Exception"; }
-};
-
-class ProgramLoadingException : public std::exception {
-    const char *what() const throw() { return "Program Loading Exception"; }
-};
 
 class Shader {
   public:
@@ -65,23 +58,23 @@ class ShaderDB {
 	}
     };
 
-    GLuint load_program(const std::initializer_list<std::string> shaders);
+    std::optional<GLuint> load_program(const std::initializer_list<std::string> shaders);
     void check_reload();
-    Shader get_shader(GLuint handler);
-    Program get_program(GLuint handler);
+    std::optional<Shader> get_shader(GLuint handler);
+    std::optional<Program> get_program(GLuint handler);
 
   private:
     ShaderDB() {
-	m_program_counter = 0;
-	m_shader_counter = 0;
+	m_program_counter = 1;
+	m_shader_counter = 1;
     };
     ShaderDB(const ShaderDB &);
     void operator=(const ShaderDB &);
 
-    Shader load_shader(std::string path);
+    std::optional<Shader> load_shader(std::string path);
     GLenum shader_type(std::string path);
 
-    void reload_program(GLuint handler);
+    bool reload_program(GLuint handler);
 
     GLuint m_program_counter;
     GLuint m_shader_counter;

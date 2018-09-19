@@ -5,9 +5,21 @@
 #include <sstream>
 #include <utility>
 
-Shader ShaderDB::get_shader(GLuint handler) { return m_shaders.at(handler); }
+std::optional<Shader> ShaderDB::get_shader(GLuint handler) {
+    auto it = m_shaders.find(handler);
+    if (it == m_shaders.end()) {
+	return {};
+    }
+    return std::optional(it->second);
+}
 
-Program ShaderDB::get_program(GLuint handler) { return m_programs.at(handler); }
+std::optional<Program> ShaderDB::get_program(GLuint handler) {
+    auto it = m_programs.find(handler);
+    if (it == m_programs.end()) {
+	return {};
+    }
+    return std::optional(it->second);
+}
 
 GLenum ShaderDB::shader_type(std::string path) {
     std::string ext = path.substr(path.rfind('.'), std::string::npos);
@@ -25,7 +37,7 @@ GLenum ShaderDB::shader_type(std::string path) {
     }
 }
 
-Shader ShaderDB::load_shader(std::string path) {
+std::optional<Shader> ShaderDB::load_shader(std::string path) {
     GLuint addr = glCreateShader(shader_type(path));
     std::string source = read_file(path).c_str();
     const char *source_ptr = source.c_str();
@@ -43,8 +55,9 @@ Shader ShaderDB::load_shader(std::string path) {
 	glGetShaderInfoLog(addr, log_len, NULL, log);
 
 	std::cerr << "[ERR] Shader: '" << path << "' compilation error: " << log << std::endl;
+	// TODO: pass log.
 	delete[] log;
-	throw ShaderLoadingException();
+	return {};
     }
 
     // Check if the shader object already exist:
@@ -81,16 +94,19 @@ Shader ShaderDB::load_shader(std::string path) {
 
     m_shaders[shader.handler] = shader;
     m_shaders_path[path] = shader.handler;
-    return shader;
+    return std::optional(shader);
 }
 
-GLuint ShaderDB::load_program(const std::initializer_list<std::string> shaders_path) {
+std::optional<GLuint> ShaderDB::load_program(const std::initializer_list<std::string> shaders_path) {
     GLuint addr = glCreateProgram();
 
     std::vector<Shader> shaders;
     for (std::string path : shaders_path) {
 	// NOTE: Check if shader already loaded. Add an option to force reload ?
-	shaders.push_back(load_shader(path));
+	auto shader = load_shader(path);
+	if (shader) {
+	    shaders.push_back(*shader);
+	}
     }
 
     for (Shader shader : shaders) {
@@ -107,7 +123,7 @@ GLuint ShaderDB::load_program(const std::initializer_list<std::string> shaders_p
 	glGetProgramInfoLog(addr, log_length, NULL, log);
 	std::cerr << "Program link failure: " << log << std::endl;
 	delete[] log;
-	throw ProgramLoadingException();
+	return {};
     }
 
     for (Shader shader : shaders) {
@@ -129,10 +145,10 @@ GLuint ShaderDB::load_program(const std::initializer_list<std::string> shaders_p
     }
 
     m_programs[program.handler] = program;
-    return program.handler;
+    return std::optional(program.handler);
 }
 
-void ShaderDB::reload_program(GLuint handler) {
+bool ShaderDB::reload_program(GLuint handler) {
     Program program = m_programs[handler];
 
     // TODO: Some duplicate code, should be refactored.
@@ -156,7 +172,7 @@ void ShaderDB::reload_program(GLuint handler) {
 	glGetProgramInfoLog(new_addr, log_length, NULL, log);
 	std::cerr << "Program link failure: " << log << std::endl;
 	delete[] log;
-	throw ProgramLoadingException();
+	return false;
     }
 
     for (Shader shader : shaders) {
@@ -176,6 +192,7 @@ void ShaderDB::reload_program(GLuint handler) {
     }
 
     m_programs[program.handler] = program;
+    return true;
 }
 
 void ShaderDB::check_reload() {
@@ -183,13 +200,13 @@ void ShaderDB::check_reload() {
 	Shader shader = m_shaders[shader_path.second];
 	time_t mt = get_last_modified_time(shader_path.first);
 	if (mt > shader.last_modified) {
-	    try {
-		std::cerr << "[NFO] Reloading shader '" << shader.path << "' ..." << std::endl;
-		Shader reloaded = load_shader(shader_path.first);
+	    std::cerr << "[NFO] Reloading shader '" << shader.path << "' ..." << std::endl;
+	    auto reloaded = load_shader(shader_path.first);
+	    if (reloaded) {
 		for (std::pair<GLuint, Program> program : m_programs) {
 		    bool should_reload = false;
 		    for (GLuint sh : program.second.shaders) {
-			if (sh == reloaded.handler) {
+			if (sh == reloaded->handler) {
 			    should_reload = true;
 			    break;
 			}
@@ -199,10 +216,6 @@ void ShaderDB::check_reload() {
 			reload_program(program.first);
 		    }
 		}
-	    } catch (ShaderLoadingException &) {
-		std::cerr << "[ERR] Failed to reload '" << shader.path << "', failling back to previous version." << std::endl;
-	    } catch (ProgramLoadingException &) {
-		std::cerr << "[ERR] Failed to reload a program, failling back to previous version." << std::endl;
 	    }
 	    m_shaders[shader_path.second].last_modified = mt;
 	}

@@ -53,6 +53,8 @@
         "xtree": "cpp",
         "__config": "cpp",
         "__nullptr": "cpp",
-        "optional": "cpp"
+        "optional": "cpp",
+        "chrono": "cpp",
+        "ratio": "cpp"
     }
 }

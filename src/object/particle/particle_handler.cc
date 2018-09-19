@@ -75,9 +75,21 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
     m_texture = ImageHandler::load_texture("data/images/particle.png");
 
     // shaders.
-    m_visual_program = m_shaderdb.load_program(
+    auto vprog = m_shaderdb.load_program(
         {"data/shaders/particle/particle.gs", "data/shaders/particle/particle.vs", "data/shaders/particle/particle.fs"});
-    m_compute_program = m_shaderdb.load_program({"data/shaders/particle/particle.cs"});
+    auto cprog = m_shaderdb.load_program({"data/shaders/particle/particle.cs"});
+
+    if (vprog) {
+	m_visual_program = *vprog;
+    } else {
+	m_visual_program = 0;
+    }
+
+    if (cprog) {
+	m_compute_program = *cprog;
+    } else {
+	m_compute_program = 0;
+    }
 
     // VAO
     glGenVertexArrays(1, &m_vao);
@@ -109,17 +121,19 @@ void ParticleHandler::update_particules(float time, float dt, float speed_factor
     if (!m_compute_supported) {
 	return;
     }
-    Program program = m_shaderdb.get_program(m_compute_program);
-    glUseProgram(program.addr);
-    glUniform1f(program.uniforms_location["time"], time);
-    glUniform1f(program.uniforms_location["dt"], dt);
-    glUniform1f(program.uniforms_location["speed"], speed_factor);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_vbo_pos);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_vbo_vel);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_vbo_ttl);
-    glDispatchCompute(m_max_part / 128, 1, 1);
-    glMemoryBarrier(GL_ALL_BARRIER_BITS);
-    glUseProgram(0);
+    auto program = m_shaderdb.get_program(m_compute_program);
+    if (program) {
+	glUseProgram(program->addr);
+	glUniform1f(program->uniforms_location["time"], time);
+	glUniform1f(program->uniforms_location["dt"], dt);
+	glUniform1f(program->uniforms_location["speed"], speed_factor);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_vbo_pos);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_vbo_vel);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_vbo_ttl);
+	glDispatchCompute(m_max_part / 128, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	glUseProgram(0);
+    }
 }
 
 void ParticleHandler::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model) {
@@ -136,17 +150,20 @@ void ParticleHandler::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model)
 
     glBindTexture(GL_TEXTURE_2D, m_texture);
 
-    Program program = m_shaderdb.get_program(m_visual_program);
-    glUseProgram(program.addr);
-    glUniform1f(program.uniforms_location["time"], ctx->t_time);
-    glUniform1f(program.uniforms_location["dt"], ctx->f_time);
+    auto program = m_shaderdb.get_program(m_visual_program);
+    if (program) {
+	glUseProgram(program->addr);
+	glUniform1f(program->uniforms_location["time"], ctx->t_time);
+	glUniform1f(program->uniforms_location["dt"], ctx->f_time);
 
-    glUniform4f(program.uniforms_location["part_colour"], m_base_colour.r, m_base_colour.g, m_base_colour.b, 1.0);
-    glUniform4f(program.uniforms_location["eye"], ctx->activeCamera->eye().x, ctx->activeCamera->eye().y, ctx->activeCamera->eye().z, 1.0);
+	glUniform4f(program->uniforms_location["part_colour"], m_base_colour.r, m_base_colour.g, m_base_colour.b, 1.0);
+	glUniform4f(program->uniforms_location["eye"], ctx->activeCamera->eye().x, ctx->activeCamera->eye().y, ctx->activeCamera->eye().z,
+	            1.0);
 
-    glUniformMatrix4fv(program.uniforms_location["view"], 1, GL_FALSE, glm::value_ptr(ctx->activeCamera->view()));
-    glUniformMatrix4fv(program.uniforms_location["projection"], 1, GL_FALSE, glm::value_ptr(ctx->perspective));
-    glUniformMatrix4fv(program.uniforms_location["model"], 1, GL_FALSE, glm::value_ptr(parts_model));
+	glUniformMatrix4fv(program->uniforms_location["view"], 1, GL_FALSE, glm::value_ptr(ctx->activeCamera->view()));
+	glUniformMatrix4fv(program->uniforms_location["projection"], 1, GL_FALSE, glm::value_ptr(ctx->perspective));
+	glUniformMatrix4fv(program->uniforms_location["model"], 1, GL_FALSE, glm::value_ptr(parts_model));
+    }
 
     glBindVertexArray(m_vao);
     glDrawArrays(GL_POINTS, 0, m_max_part);
