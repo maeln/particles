@@ -10,6 +10,7 @@
 
 ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, glm::vec3 base_colour)
     : SceneNode("particules") {
+    m_compute_supported = glewIsSupported("GL_ARB_compute_shader");
     m_uniform = std::uniform_real_distribution<double>(-1.0, 1.0);
     m_max_part = nb_particule;
     m_ttl = ttl_particule;
@@ -24,11 +25,20 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
     m_part_ttl.resize(m_max_part, m_ttl);
 
     // Position
-    for (GLuint n = 0; n < m_max_part; ++n) {
-	m_part_pos[n * 4 + 0] = m_pstart.x;
-	m_part_pos[n * 4 + 1] = m_pstart.y;
-	m_part_pos[n * 4 + 2] = m_pstart.z;
-	m_part_pos[n * 4 + 3] = 1.f;
+    if (m_compute_supported) {
+	for (GLuint n = 0; n < m_max_part; ++n) {
+	    m_part_pos[n * 4 + 0] = m_pstart.x;
+	    m_part_pos[n * 4 + 1] = m_pstart.y;
+	    m_part_pos[n * 4 + 2] = m_pstart.z;
+	    m_part_pos[n * 4 + 3] = 1.f;
+	}
+    } else {
+	for (GLuint n = 0; n < m_max_part; ++n) {
+	    m_part_pos[n * 4 + 0] = m_uniform(m_randgen);
+	    m_part_pos[n * 4 + 1] = m_uniform(m_randgen);
+	    m_part_pos[n * 4 + 2] = m_uniform(m_randgen);
+	    m_part_pos[n * 4 + 3] = 1.f;
+	}
     }
 
     // Velocity
@@ -95,6 +105,9 @@ ParticleHandler::~ParticleHandler() {
 }
 
 void ParticleHandler::update_particules(float time, float dt, float speed_factor) {
+    if (!m_compute_supported) {
+	return;
+    }
     Program program = m_shaderdb.get_program(m_compute_program);
     glUseProgram(program.addr);
     glUniform1f(program.uniforms_location["time"], time);

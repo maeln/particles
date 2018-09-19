@@ -46,5 +46,7 @@ class ParticleHandler : public SceneNode {
     GLuint m_visual_program;
     GLuint m_compute_program;
 
+    bool m_compute_supported;
+
     float *m_data;
 };

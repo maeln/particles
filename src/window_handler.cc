@@ -33,7 +33,7 @@ WindowHandler::WindowHandler() {
 
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
@@ -126,6 +126,12 @@ void WindowHandler::setup() {
 }
 
 void WindowHandler::rendering_loop() {
+#ifdef __APPLE__
+    int fbwidth, fbheight;
+    glfwGetFramebufferSize(m_window, &fbwidth, &fbheight);
+    resize_callback(m_window, fbwidth, fbheight);
+#endif
+
     double mouse_x, mouse_y;
     glfwGetCursorPos(m_window, &mouse_x, &mouse_y);
     double mouse_dx = 0.0;
