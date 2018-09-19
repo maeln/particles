@@ -142,10 +142,6 @@ void WindowHandler::rendering_loop() {
 	glfwPollEvents();
 
 	// GUI:
-	std::shared_ptr<ParticleHandler> parts1 = std::dynamic_pointer_cast<ParticleHandler>(m_scene.find_node("parts1"));
-	glm::vec3 parts_color = parts1->get_colour();
-	float col[3] = {parts_color.r, parts_color.g, parts_color.b};
-
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -159,8 +155,16 @@ void WindowHandler::rendering_loop() {
 	ImGui::Text("dt  : %.2fms", m_frame_dt * 1000.0);
 	ImGui::Text("fps : %.2f", 1.0 / m_frame_dt);
 
-	ImGui::ColorEdit3("Parts colour", col);
-	parts1->set_colour(glm::vec3(col[0], col[1], col[2]));
+	auto node_parts = m_scene.find_node("parts1");
+	if (node_parts) {
+	    std::shared_ptr<ParticleHandler> parts1 = std::dynamic_pointer_cast<ParticleHandler>(*node_parts);
+	    glm::vec3 parts_color = parts1->get_colour();
+	    float col[3] = {parts_color.r, parts_color.g, parts_color.b};
+	    changed = ImGui::ColorEdit3("Parts colour", col);
+	    if (changed) {
+		parts1->set_colour(glm::vec3(col[0], col[1], col[2]));
+	    }
+	}
 
 	ImGui::End();
 

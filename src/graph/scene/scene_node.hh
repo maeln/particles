@@ -2,6 +2,7 @@
 
 #include <glm/mat4x4.hpp>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -23,7 +24,7 @@ class SceneNode : public Drawable {
 
     void add_child(std::shared_ptr<SceneNode> node);
     void rm_child(std::shared_ptr<SceneNode> node);
-    std::shared_ptr<SceneNode> find_node(std::string name);
+    std::optional<std::shared_ptr<SceneNode>> find_node(std::string name);
 
     glm::mat4x4 transformation();
 

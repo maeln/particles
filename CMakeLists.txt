@@ -28,7 +28,7 @@ add_definitions(
 )
 
 add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLEW)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 FILE(GLOB_RECURSE HEADERS "src/*.hh")
 FILE(GLOB_RECURSE SOURCES "src/*.cc")
