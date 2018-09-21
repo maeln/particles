@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+#include "src/object/positionable.hh"
+
 #include "src/object/particle/particle_handler.hh"
 #include "src/object/primitive/fs_quad/fs_quad.hh"
 #include "src/object/primitive/plane/plane.hh"
@@ -227,7 +229,12 @@ void WindowHandler::rendering_loop()
 			m_shader_reload_counter = 0.0;
 		}
 
-		auto end = std::chrono::system_clock::now();
+		auto plane = m_scene.find_node("plane1");
+		if (plane)
+			std::dynamic_pointer_cast<Plane>(*plane)->rotate(glm::vec3(1.0, 0.0, 0.0), (3.1415 / 4.0) * m_frame_dt);
+
+		auto end
+			= std::chrono::system_clock::now();
 		std::chrono::duration<double> elapsed = end - start;
 
 		m_frame_dt = elapsed.count();

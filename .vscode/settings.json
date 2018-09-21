@@ -55,6 +55,7 @@
         "__nullptr": "cpp",
         "optional": "cpp",
         "chrono": "cpp",
-        "ratio": "cpp"
+        "ratio": "cpp",
+        "deque": "cpp"
     }
 }

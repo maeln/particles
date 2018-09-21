@@ -141,7 +141,7 @@ void ParticleHandler::update_particules(float time, float dt, float speed_factor
 
 void ParticleHandler::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model)
 {
-	glm::mat4 parts_model = model * transformation();
+	glm::mat4 parts_model = model * transform();
 
 	// Update position
 	update_particules(ctx->t_time, ctx->f_time);

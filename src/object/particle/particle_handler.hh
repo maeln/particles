@@ -8,9 +8,10 @@
 #include <vector>
 
 #include "src/graph/scene/scene_node.hh"
+#include "src/object/positionable.hh"
 #include "src/shaders/shaderdb.hh"
 
-class ParticleHandler : public SceneNode {
+class ParticleHandler : public SceneNode, public Positionable {
 public:
 	ParticleHandler(GLuint nb_particule, float ttl_particule, float delta_ttl, glm::vec3 start_point, glm::vec3 base_colour);
 	~ParticleHandler();

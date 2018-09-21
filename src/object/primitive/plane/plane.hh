@@ -4,11 +4,13 @@
 
 #include "src/graph/scene/scene_node.hh"
 #include "src/object/mesh/primitive/plane_mesh.hh"
+#include "src/object/positionable.hh"
 #include "src/shaders/shaderdb.hh"
 #include <memory>
 #include <vector>
 
-class Plane : public SceneNode {
+
+class Plane : public SceneNode, public Positionable {
 public:
 	Plane();
 	~Plane();

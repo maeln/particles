@@ -28,5 +28,5 @@ void FSQuad::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model)
 	m_mesh.draw();
 	glUseProgram(0);
 
-	SceneNode::draw(ctx, model * transformation());
+	SceneNode::draw(ctx, model * transform());
 };

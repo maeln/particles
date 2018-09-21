@@ -19,7 +19,7 @@ Plane::~Plane() { m_mesh.remove_from_gpu(); }
 
 void Plane::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model)
 {
-	glm::mat4 m_model = model * transformation();
+	glm::mat4 m_model = model * transform();
 
 	auto program = m_shaderdb.get_program(m_program);
 	if (program) {

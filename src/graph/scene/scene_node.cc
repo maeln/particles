@@ -63,18 +63,9 @@ std::optional<std::shared_ptr<SceneNode>> SceneNode::find_node(std::string name)
 	return {};
 }
 
-glm::mat4x4 SceneNode::transformation() { return m_transformation; }
-
-void SceneNode::rotate(float angle, glm::vec3 axis) { m_transformation = glm::rotate(m_transformation, angle, axis); }
-
-void SceneNode::scale(glm::vec3 factors) { m_transformation = glm::scale(m_transformation, factors); }
-
-void SceneNode::translate(glm::vec3 factors) { m_transformation = glm::translate(m_transformation, factors); }
-
 void SceneNode::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 transfo)
 {
-	glm::mat4x4 final_transfo = transfo * transformation();
 	for (size_t i = 0; i < m_childs.size(); i++) {
-		m_childs[i]->draw(ctx, final_transfo);
+		m_childs[i]->draw(ctx, transfo);
 	}
 }
