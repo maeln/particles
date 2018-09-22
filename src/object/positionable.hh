@@ -19,6 +19,11 @@ public:
 		m_stack.clear();
 	};
 
+	void commit_transform()
+	{
+		m_stack.flatten();
+	};
+
 	void rotate(glm::vec3 axis, float angle)
 	{
 		m_stack.push(glm::rotate(glm::mat4(), angle, axis));

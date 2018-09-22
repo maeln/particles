@@ -37,6 +37,13 @@ public:
 		m_stack.clear();
 	};
 
+	void flatten()
+	{
+		recompute();
+		m_stack.clear();
+		m_stack.push_front(m_top);
+	};
+
 private:
 	void recompute()
 	{

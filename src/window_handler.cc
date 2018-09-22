@@ -116,6 +116,7 @@ void WindowHandler::setup()
 
 	std::shared_ptr<Plane> plane(new Plane());
 	plane->translate(glm::vec3(0.0, -0.5, 0.0));
+	plane->commit_transform();
 	plane->set_name("plane1");
 
 	/* Set up the scene */
@@ -230,8 +231,11 @@ void WindowHandler::rendering_loop()
 		}
 
 		auto plane = m_scene.find_node("plane1");
-		if (plane)
-			std::dynamic_pointer_cast<Plane>(*plane)->rotate(glm::vec3(1.0, 0.0, 0.0), (3.1415 / 4.0) * m_frame_dt);
+		if (plane) {
+			std::shared_ptr<Plane> plane_ptr = std::dynamic_pointer_cast<Plane>(*plane);
+			plane_ptr->rotate(glm::vec3(1.0, 0.0, 0.0), (3.1415 / 4.0) * m_frame_dt);
+			plane_ptr->commit_transform();
+		}
 
 		auto end
 			= std::chrono::system_clock::now();
