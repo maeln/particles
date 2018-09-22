@@ -24,7 +24,6 @@ public:
 
 private:
 	GLuint m_vbo_pos;
-	GLuint m_vbo_vel;
 	GLuint m_vbo_ttl;
 	GLuint m_vao;
 
@@ -40,7 +39,6 @@ private:
 	std::uniform_real_distribution<float> m_uniform;
 
 	std::vector<float> m_part_pos;
-	std::vector<float> m_part_vel;
 	std::vector<float> m_part_ttl;
 
 	ShaderDB& m_shaderdb = ShaderDB::instance();

@@ -22,7 +22,6 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 
 	// Since the std140 memory layout will round to 16bytes anyway, we might as well use vec4 instead of vec3.
 	m_part_pos.resize(m_max_part * 4);
-	m_part_vel.resize(m_max_part * 4);
 	m_part_ttl.resize(m_max_part, m_ttl);
 
 	// Position
@@ -42,14 +41,6 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 		}
 	}
 
-	// Velocity
-	for (GLuint n = 0; n < m_max_part; ++n) {
-		m_part_vel[n * 4 + 0] = m_uniform(m_randgen);
-		m_part_vel[n * 4 + 1] = m_uniform(m_randgen);
-		m_part_vel[n * 4 + 2] = m_uniform(m_randgen);
-		m_part_vel[n * 4 + 3] = 1.f;
-	}
-
 	if (m_dttl != 0) {
 		std::uniform_real_distribution<double> unif = std::uniform_real_distribution<double>(-m_dttl, m_dttl);
 		for (GLuint n = 0; n < m_part_ttl.size(); ++n) {
@@ -60,10 +51,6 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 	glGenBuffers(1, &m_vbo_pos);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_pos);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_part_pos.size(), m_part_pos.data(), GL_DYNAMIC_COPY);
-
-	glGenBuffers(1, &m_vbo_vel);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_vel);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_part_vel.size(), m_part_vel.data(), GL_DYNAMIC_COPY);
 
 	glGenBuffers(1, &m_vbo_ttl);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_ttl);
@@ -100,13 +87,9 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_vel);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_ttl);
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float), 0);
 
 	glBindVertexArray(0);
 }
@@ -114,7 +97,6 @@ ParticleHandler::ParticleHandler(GLuint nb_particule, float ttl_particule, float
 ParticleHandler::~ParticleHandler()
 {
 	glDeleteBuffers(1, &m_vbo_pos);
-	glDeleteBuffers(1, &m_vbo_vel);
 	glDeleteBuffers(1, &m_vbo_ttl);
 	glDeleteVertexArrays(1, &m_vao);
 }
@@ -131,7 +113,6 @@ void ParticleHandler::update_particules(float time, float dt, float speed_factor
 		glUniform1f(program->uniforms_location["dt"], dt);
 		glUniform1f(program->uniforms_location["speed"], speed_factor);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_vbo_pos);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_vbo_vel);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_vbo_ttl);
 		glDispatchCompute(m_max_part / 128, 1, 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
@@ -176,7 +157,6 @@ void ParticleHandler::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
 
 	glUseProgram(0);
 	glDisable(GL_BLEND);

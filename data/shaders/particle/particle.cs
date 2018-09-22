@@ -1,15 +1,8 @@
 #version 430 core
 
-#define GRAVITY 9.81
-#define GRAVITY_DIRECTION vec4(0.0, -1.0, 0.0, 0.0)
-
 layout(local_size_x = 128, local_size_y = 1, local_size_z = 1) in;
-
 layout(std140, binding = 0) buffer PositionBuffer { vec4 positions[]; };
-
-layout(std140, binding = 1) buffer VelocityBuffer { vec4 velocities[]; };
-
-layout(std430, binding = 2) buffer TtlBuffer { float ttls[]; };
+layout(std430, binding = 1) buffer TtlBuffer { float ttls[]; };
 
 uniform float time;
 uniform float dt;
@@ -22,22 +15,54 @@ void main(void)
 	uint id = gl_GlobalInvocationID.x;
 	float ttl = ttls[id];
 	vec4 pos = positions[id];
-	vec4 grav = GRAVITY_DIRECTION * 0.0981 * dt;
-	vec4 vortex = vec4(sin(ttl * 18.0) * 0.6, time * 0.01, cos(ttl * 18.0) * 0.6, 0.0) * dt;
-	vec4 attraction = (vec4(0.0, 0.3, 0.0, 0.0) - pos) * dt;
 
-	vec4 vel = normalize(velocities[id] + grav + attraction + vortex);
+	float workGroupNum = float(gl_NumWorkGroups.x);
+	float workGroupSize = float(gl_WorkGroupSize.x);
+	float workGroupLen = workGroupNum * workGroupSize;
+	float workGroupLoc = float(gl_WorkGroupID.x);
+	float localId = float(gl_LocalInvocationID.x);
 
+	float i = float(id);
+	float s = workGroupLen;
+
+	float mx = 64.0;
+	float my = 64.0;
+
+	float x = i / (mx * my);
+	float z = mod(i / mx, my);
+	float y = mod(i, mx);
+
+	vec3 gl = vec3(x, y, z) / 16.0;
+
+	/*
+	const float mgx = floor(sqrt(workGroupNum));
+	float gx = mod(workGroupLoc, mgx);
+	float gy = floor(workGroupLoc / mgx);
+	vec3 g = vec3(gx, 0.0, gy);
+
+	const float mlx = floor(sqrt(workGroupSize));
+	float lx = mod(localId, mlx);
+	float ly = floor(localId / mlx);
+	vec3 l = vec3(lx, 0.0, ly);
+
+	vec3 gl = g + l / sqrt(workGroupSize);
+	*/
+
+	/*
+	vec3 localCoord = vec3(localId / (workGroupSize * workGroupSize), 0.0, mod(localId, workGroupSize));
+	vec3 groupCoord = vec3(workGroupLoc / (workGroupNum * workGroupNum), 0.0, mod(workGroupLoc, workGroupNum));
+	vec3 globalCoord = groupCoord + localCoord;
+	*/
+
+	// for now, never ending particles
+	/*
 	float nttl = ttl - dt;
-	vec4 npos = vec4(pos.xyz + vel.xyz * dt, 1.0);
-
 	if (nttl <= 0.0) {
 		npos = vec4(0.0, 0.0, 0.0, 1.0);
 		nttl = 2.5;
-		vel = normalize(vec4(random(vel.yx) - random(vel.xy), random(vel.yz), random(vel.zx) - random(vel.xz), 1.0));
 	}
+	*/
 
-	positions[id] = npos;
-	velocities[id] = vel;
-	ttls[id] = nttl;
+	positions[id] = vec4(gl, 1.0);
+	ttls[id] = ttl;
 }

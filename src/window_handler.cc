@@ -109,7 +109,7 @@ void WindowHandler::setup()
 	m_perpective_matrix = glm::perspective(glm::radians(60.f), (float)m_width / (float)m_height, 0.1f, 10.f);
 	m_ctx->perspective = m_perpective_matrix;
 
-	m_max_part = 128 * 100;
+	m_max_part = 64 * 64 * 64;
 	std::shared_ptr<ParticleHandler> particles(
 		new ParticleHandler(m_max_part, 2.0, 2.0, glm::vec3(0.0, 0.0, 0.0), glm::vec3(41.0 / 255.0, 114.0 / 255.0, 200.0 / 255.0)));
 	particles->set_name("parts1");
