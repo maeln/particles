@@ -11,6 +11,7 @@ SquareEmitter::SquareEmitter(glm::vec3 square, glm::vec3 density, glm::vec4 colo
 	m_square = square;
 	m_density = density;
 	m_color = color;
+	m_nbparts = static_cast<GLuint>(density.x * density.y * density.z);
 
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
@@ -24,14 +25,20 @@ SquareEmitter::SquareEmitter(glm::vec3 square, glm::vec3 density, glm::vec4 colo
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(4 * sizeof(float)));
 
-	m_nbparts = static_cast<GLuint>(density.x * density.y * density.z);
-	std::vector<float> offset = std::vector<float>(m_nbparts * 4, 0.0);
-	glGenBuffers(1, &m_offset);
-	glBindBuffer(GL_ARRAY_BUFFER, m_offset);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * offset.size(), offset.data(), GL_STATIC_DRAW);
+	std::vector<float> initpos = std::vector<float>(m_nbparts * 4, 0.0);
+	glGenBuffers(1, &m_init);
+	glBindBuffer(GL_ARRAY_BUFFER, m_init);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * initpos.size(), initpos.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 	glVertexAttribDivisor(2, 1);
+
+	glGenBuffers(1, &m_offset);
+	glBindBuffer(GL_ARRAY_BUFFER, m_offset);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * initpos.size(), initpos.data(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	glVertexAttribDivisor(3, 1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	m_texture = ImageHandler::load_texture("data/images/particle.png");
@@ -54,7 +61,7 @@ SquareEmitter::SquareEmitter(glm::vec3 square, glm::vec3 density, glm::vec4 colo
 		glUseProgram(program->addr);
 		glUniform3f(program->uniforms_location["square"], m_square.x, m_square.y, m_square.z);
 		glUniform3f(program->uniforms_location["density"], m_density.x, m_density.y, m_density.z);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_offset);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_init);
 		glDispatchCompute(m_nbparts / 128, 1, 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		glUseProgram(0);
@@ -67,6 +74,18 @@ SquareEmitter::~SquareEmitter()
 
 void SquareEmitter::update_particles(std::shared_ptr<SceneContext> ctx)
 {
+	auto program = m_shaderdb.get_program(m_updater);
+	if (program) {
+		glUseProgram(program->addr);
+		glUniform1f(program->uniforms_location["time"], ctx->t_time);
+		glUniform1f(program->uniforms_location["dt"], ctx->f_time);
+		glUniform3f(program->uniforms_location["square"], m_square.x, m_square.y, m_square.z);
+		glUniform3f(program->uniforms_location["density"], m_density.x, m_density.y, m_density.z);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_offset);
+		glDispatchCompute(m_nbparts / 128, 1, 1);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+		glUseProgram(0);
+	}
 }
 
 void SquareEmitter::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model)

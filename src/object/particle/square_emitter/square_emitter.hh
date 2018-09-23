@@ -31,6 +31,7 @@ private:
 	GLuint m_updater;
 	GLuint m_material;
 
+	GLuint m_init;
 	GLuint m_offset;
 	GLuint m_point;
 	GLuint m_vao;

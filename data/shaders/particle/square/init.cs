@@ -1,7 +1,7 @@
 #version 430 core
 
 layout(local_size_x = 128, local_size_y = 1, local_size_z = 1) in;
-layout(std140, binding = 0) buffer OffsetBuffer { vec4 offset[]; };
+layout(std140, binding = 0) buffer InitBuffer { vec4 init[]; };
 
 uniform vec3 square;
 uniform vec3 density;
@@ -24,5 +24,5 @@ void main(void)
 	// for now, just put them randomly
 	vec3 pos = vec3(random(vec2(float(id), density.y)), random(vec2(float(id), square.y)), random(vec2(float(id), density.x)));
 
-	offset[index] = vec4(gl, 1.0);
+	init[index] = vec4(gl, 1.0);
 }
