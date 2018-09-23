@@ -15,6 +15,7 @@
 #include "src/object/positionable.hh"
 
 #include "src/object/particle/particle_handler.hh"
+#include "src/object/particle/square_emitter/square_emitter.hh"
 #include "src/object/primitive/fs_quad/fs_quad.hh"
 #include "src/object/primitive/plane/plane.hh"
 
@@ -109,19 +110,25 @@ void WindowHandler::setup()
 	m_perpective_matrix = glm::perspective(glm::radians(60.f), (float)m_width / (float)m_height, 0.1f, 10.f);
 	m_ctx->perspective = m_perpective_matrix;
 
+	/*
 	m_max_part = 64 * 64 * 64;
 	std::shared_ptr<ParticleHandler> particles(
 		new ParticleHandler(m_max_part, 2.0, 2.0, glm::vec3(0.0, 0.0, 0.0), glm::vec3(41.0 / 255.0, 114.0 / 255.0, 200.0 / 255.0)));
 	particles->set_name("parts1");
+	*/
+
+	std::shared_ptr<SquareEmitter> emitter(new SquareEmitter(glm::vec3(8.0, 4.0, 8.0), glm::vec3(64.0, 32.0, 64.0), glm::vec4(0.4, 0.1, 0.8, 1.0)));
+	emitter->set_name("emitter1");
 
 	std::shared_ptr<Plane> plane(new Plane());
 	plane->translate(glm::vec3(0.0, -0.5, 0.0));
 	plane->commit_transform();
 	plane->set_name("plane1");
 
-	/* Set up the scene */
+	// Set up the scene
 	m_scene.add_child(plane);
-	m_scene.add_child(particles);
+	m_scene.add_child(emitter);
+	//m_scene.add_child(particles);
 
 	/* Set up the fs quad */
 	m_fs_scene.add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/post/post.fs")));
@@ -230,12 +237,14 @@ void WindowHandler::rendering_loop()
 			m_shader_reload_counter = 0.0;
 		}
 
+		/*
 		auto plane = m_scene.find_node("plane1");
 		if (plane) {
 			std::shared_ptr<Plane> plane_ptr = std::dynamic_pointer_cast<Plane>(*plane);
 			plane_ptr->rotate(glm::vec3(1.0, 0.0, 0.0), (3.1415 / 4.0) * m_frame_dt);
 			plane_ptr->commit_transform();
 		}
+		*/
 
 		auto end
 			= std::chrono::system_clock::now();

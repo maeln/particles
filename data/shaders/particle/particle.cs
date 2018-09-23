@@ -25,12 +25,12 @@ void main(void)
 	float i = float(id);
 	float s = workGroupLen;
 
-	float mx = 64.0;
-	float my = 64.0;
+	float mx = 128.0;
+	float my = 32.0;
 
 	float x = i / (mx * my);
-	float z = mod(i / mx, my);
-	float y = mod(i, mx);
+	float z = mod(i, mx);
+	float y = mod(i / mx, my);
 
 	vec3 gl = vec3(x, y, z) / 16.0;
 
