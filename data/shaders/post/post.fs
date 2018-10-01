@@ -10,8 +10,8 @@ uniform vec2 resolution;
 uniform sampler2D screenTexture;
 
 #define MAX_DIST 1.5
-#define MIN_DIST 0.25
-#define ITER_DIST 67
+#define MIN_DIST 1.1
+#define ITER_DIST 20
 
 #define PI 3.141592
 #define saturate(x) (clamp((x), 0.0, 1.0))
@@ -31,7 +31,7 @@ vec3 aberrationColor(float f)
 
 vec2 brownConradyDistortion(vec2 uv, float factor)
 {
-	uv = uv * 2.0 - 1.0;
+	uv = uv * 1.9 - 0.95;
 
 	// positive values of K1 give barrel distortion, negative give pincushion
 	float barrelDistortion1 = 0.1 * factor; // K1 in text books
@@ -51,6 +51,10 @@ vec3 frame(vec2 uv) { return pow(texture(screenTexture, uv).rgb, vec3(2.2)); }
 void main()
 {
 	vec2 uv = gl_FragCoord.xy / resolution.xy;
+	vec2 d = brownConradyDistortion(uv, MAX_DIST);
+	if (d.x > 1.0 || d.x < 0.0 || d.y > 1.0 || d.y < 0.0) {
+		discard;
+	}
 
 	const float step_size = 1.0 / (float(ITER_DIST) - 1.0);
 	float t = step_size * hash2(uv * sin(time)); // We pseudo randomize the step to have some dithering pattern.

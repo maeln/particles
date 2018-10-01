@@ -21,5 +21,11 @@ void main(void)
 	float z = remap(mod(floor(id / density.z), density.z), 0.0, density.z, 0.0, square.z);
 	vec3 gl = vec3(x, y, z);
 
-	init[index] = vec4(gl, 1.0);
+	// for now, just put them randomly
+	float nx = remap(random(vec2(x, density.x)), 0.0, 1.0, 0.0, square.x);
+	float ny = remap(random(vec2(y, density.y)), 0.0, 1.0, 0.0, square.y);
+	float nz = remap(random(vec2(z, density.z)), 0.0, 1.0, 0.0, square.z);
+	vec3 pos = vec3(nx, ny, nz);
+
+	init[index] = vec4(pos, 1.0);
 }
