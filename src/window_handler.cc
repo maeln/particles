@@ -131,7 +131,29 @@ void WindowHandler::setup()
 	//m_scene.add_child(particles);
 
 	/* Set up the fs quad */
-	m_fs_scene.add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/post/post.fs")));
+
+	/** TODO:
+	 * For now, we create a fbo and a scene for each FS pass, it doesn't seem like a good solution.
+	 * Find a more flexible and memory efficient way.
+	 */
+
+	m_fbos.push_back(m_fb_handler.create_full_framebuffer(m_width, m_height));
+	m_fbos.push_back(m_fb_handler.create_full_framebuffer(m_width, m_height));
+
+	SceneGraph pass1;
+	pass1.add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/post/post.fs")));
+	pass1.set_fbo(m_fbos[0]);
+
+	SceneGraph pass2;
+	pass2.add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/post/fxaa/luma.fs")));
+	pass2.set_fbo(m_fbos[1]);
+
+	SceneGraph pass3;
+	pass3.add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/post/fxaa/fxaa.fs")));
+
+	m_fs_scenes.push_back(pass1);
+	m_fs_scenes.push_back(pass2);
+	m_fs_scenes.push_back(pass3);
 
 	m_dt_acc = 0.0;
 	m_frame_dt = 0.0;
@@ -221,8 +243,18 @@ void WindowHandler::rendering_loop()
 		m_scene.draw(m_ctx, glm::mat4());
 
 		// Render the framebuffer
+
+		// Pass 1: Chroma aberation + barrel distortion
 		glBindTexture(GL_TEXTURE_2D, m_fb_handler.get_framebuffer(m_scene_fbo).color);
-		m_fs_scene.draw(m_ctx, glm::mat4());
+		m_fs_scenes[0].draw(m_ctx, glm::mat4());
+
+		// Pass 2: Luma computation
+		glBindTexture(GL_TEXTURE_2D, m_fb_handler.get_framebuffer(m_fbos[0]).color);
+		m_fs_scenes[1].draw(m_ctx, glm::mat4());
+
+		// Pass 3: FXAA
+		glBindTexture(GL_TEXTURE_2D, m_fb_handler.get_framebuffer(m_fbos[1]).color);
+		m_fs_scenes[2].draw(m_ctx, glm::mat4());
 
 		glUseProgram(0);
 
@@ -266,6 +298,9 @@ void WindowHandler::resize_callback(GLFWwindow* window, int width, int height)
 	m_ctx->v_width = m_width;
 	m_ctx->v_height = m_height;
 	m_fb_handler.resize_framebuffer(m_scene_fbo, m_width, m_height);
+	for (auto fbo : m_fbos) {
+		m_fb_handler.resize_framebuffer(fbo, m_width, m_height);
+	}
 }
 
 void WindowHandler::error_callback(int error, const char* description)

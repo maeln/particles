@@ -68,6 +68,10 @@ private:
 	GLuint m_scene_fbo;
 	SceneGraph m_fs_scene;
 
+	// Should fin a better way to handle multiple post pass.
+	std::vector<SceneGraph> m_fs_scenes;
+	std::vector<GLuint> m_fbos;
+
 	std::shared_ptr<SceneContext> m_ctx;
 
 	GLuint m_max_part;

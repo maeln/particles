@@ -48,7 +48,7 @@ SquareEmitter::SquareEmitter(glm::vec3 square, glm::vec3 density, glm::vec4 colo
 	if (material)
 		m_material = *material;
 
-	auto init = m_shadb.load_program({ "data/shaders/particle/square/rand.cs" });
+	auto init = m_shadb.load_program({ "data/shaders/particle/square/init.cs" });
 	if (init)
 		m_initializer = *init;
 
