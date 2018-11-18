@@ -18,11 +18,19 @@ public:
 	MaterialData() {}
 	MaterialData(std::shared_ptr<MaterialData> other)
 	{
+		/* C++17 merge
 		floats.merge(other->floats);
 		vec2.merge(other->vec2);
 		vec3.merge(other->vec3);
 		vec4.merge(other->vec4);
 		mat4.merge(other->mat4);
+        */
+
+		floats.insert(other->floats.begin(), other->floats.end());
+		vec2.insert(other->vec2.begin(), other->vec2.end());
+		vec3.insert(other->vec3.begin(), other->vec3.end());
+		vec4.insert(other->vec4.begin(), other->vec4.end());
+		mat4.insert(other->mat4.begin(), other->mat4.end());
 	}
 
 	~MaterialData() {}
