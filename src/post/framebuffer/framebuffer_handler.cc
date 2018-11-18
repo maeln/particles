@@ -8,9 +8,11 @@ GLuint FramebufferHandler::create_full_framebuffer(double width, double height) 
 
 void FramebufferHandler::resize_framebuffer(GLuint handler, double width, double height)
 {
-	GLuint addr = get_framebuffer(handler).addr;
-	glDeleteFramebuffers(1, &addr);
-	create_framebuffer(width, height, handler);
+	if (handler != 0) {
+		GLuint addr = get_framebuffer(handler).addr;
+		glDeleteFramebuffers(1, &addr);
+		create_framebuffer(width, height, handler);
+	}
 }
 
 GLuint FramebufferHandler::create_framebuffer(double width, double height, GLuint handler)

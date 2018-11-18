@@ -76,8 +76,7 @@ WindowHandler::WindowHandler()
 	m_camera = std::shared_ptr<Camera>(new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5f, 0.01f));
 	m_ctx->activeCamera = m_camera;
 
-	m_scene_fbo = m_fb_handler.create_full_framebuffer(m_width, m_height);
-	m_scene.set_fbo(m_scene_fbo);
+	m_scene = std::shared_ptr<SceneGraph>(new SceneGraph());
 
 	m_vsync = true;
 }
@@ -117,7 +116,7 @@ void WindowHandler::setup()
 	particles->set_name("parts1");
 	*/
 
-	std::shared_ptr<SquareEmitter> emitter(new SquareEmitter(glm::vec3(32.0, 4.0, 32.0), glm::vec3(512.0, 4.0, 512.0), glm::vec4(0.4, 0.1, 0.8, 1.0)));
+	std::shared_ptr<SquareEmitter> emitter(new SquareEmitter(glm::vec3(32.0, 6.0, 32.0), glm::vec3(128.0, 4.0, 128.0), glm::vec4(0.4, 0.1, 0.8, 1.0)));
 	emitter->set_name("emitter1");
 
 	std::shared_ptr<Plane> plane(new Plane());
@@ -126,34 +125,31 @@ void WindowHandler::setup()
 	plane->set_name("plane1");
 
 	// Set up the scene
-	m_scene.add_child(plane);
-	m_scene.add_child(emitter);
+	m_scene->add_child(plane);
+	m_scene->add_child(emitter);
 	//m_scene.add_child(particles);
+	m_passes.push_back(Pass(m_scene, m_fb_handler.create_full_framebuffer(m_width, m_height)));
 
 	/* Set up the fs quad */
 
 	/** TODO:
-	 * For now, we create a fbo and a scene for each FS pass, it doesn't seem like a good solution.
-	 * Find a more flexible and memory efficient way.
+	 * The current way we handle primitives and shader make it so that we have to dupliate the fs_quad for each
+	 * fs pass.
+	 * 
+	 * The way to go should be to separate enterely the primitive and the "material".
 	 */
+	// m_fb_handler.create_full_framebuffer(m_width, m_height)
+	std::shared_ptr<SceneGraph> pass1 = std::shared_ptr<SceneGraph>(new SceneGraph());
+	pass1->add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/post/post.fs")));
+	m_passes.push_back(Pass(pass1, m_fb_handler.create_full_framebuffer(m_width, m_height)));
 
-	m_fbos.push_back(m_fb_handler.create_full_framebuffer(m_width, m_height));
-	m_fbos.push_back(m_fb_handler.create_full_framebuffer(m_width, m_height));
+	std::shared_ptr<SceneGraph> pass2 = std::shared_ptr<SceneGraph>(new SceneGraph());
+	pass2->add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/post/fxaa/luma.fs")));
+	m_passes.push_back(Pass(pass2, m_fb_handler.create_full_framebuffer(m_width, m_height)));
 
-	SceneGraph pass1;
-	pass1.add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/post/post.fs")));
-	pass1.set_fbo(m_fbos[0]);
-
-	SceneGraph pass2;
-	pass2.add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/post/fxaa/luma.fs")));
-	pass2.set_fbo(m_fbos[1]);
-
-	SceneGraph pass3;
-	pass3.add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/post/fxaa/fxaa.fs")));
-
-	m_fs_scenes.push_back(pass1);
-	m_fs_scenes.push_back(pass2);
-	m_fs_scenes.push_back(pass3);
+	std::shared_ptr<SceneGraph> pass3 = std::shared_ptr<SceneGraph>(new SceneGraph());
+	pass3->add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/post/fxaa/fxaa.fs")));
+	m_passes.push_back(Pass(pass3));
 
 	m_dt_acc = 0.0;
 	m_frame_dt = 0.0;
@@ -190,7 +186,7 @@ void WindowHandler::rendering_loop()
 		ImGui::Text("dt  : %.2fms", m_frame_dt * 1000.0);
 		ImGui::Text("fps : %.2f", 1.0 / m_frame_dt);
 
-		auto node_parts = m_scene.find_node("parts1");
+		auto node_parts = m_scene->find_node("parts1");
 		if (node_parts) {
 			std::shared_ptr<ParticleHandler> parts1 = std::dynamic_pointer_cast<ParticleHandler>(*node_parts);
 			glm::vec3 parts_color = parts1->get_colour();
@@ -239,22 +235,17 @@ void WindowHandler::rendering_loop()
 		m_ctx->t_time = m_dt_acc;
 		m_ctx->f_time = m_frame_dt;
 
-		// Render stuff here.
-		m_scene.draw(m_ctx, glm::mat4());
-
-		// Render the framebuffer
+		// Pass 0: The scene
+		m_passes[0].render(m_ctx);
 
 		// Pass 1: Chroma aberation + barrel distortion
-		glBindTexture(GL_TEXTURE_2D, m_fb_handler.get_framebuffer(m_scene_fbo).color);
-		m_fs_scenes[0].draw(m_ctx, glm::mat4());
-
 		// Pass 2: Luma computation
-		glBindTexture(GL_TEXTURE_2D, m_fb_handler.get_framebuffer(m_fbos[0]).color);
-		m_fs_scenes[1].draw(m_ctx, glm::mat4());
-
 		// Pass 3: FXAA
-		glBindTexture(GL_TEXTURE_2D, m_fb_handler.get_framebuffer(m_fbos[1]).color);
-		m_fs_scenes[2].draw(m_ctx, glm::mat4());
+
+		for (GLuint i = 0; i < 3; ++i) {
+			glBindTexture(GL_TEXTURE_2D, m_fb_handler.get_framebuffer(m_passes[i].get_fbo()).color);
+			m_passes[i + 1].render(m_ctx);
+		}
 
 		glUseProgram(0);
 
@@ -297,9 +288,8 @@ void WindowHandler::resize_callback(GLFWwindow* window, int width, int height)
 	m_ctx->perspective = m_perpective_matrix;
 	m_ctx->v_width = m_width;
 	m_ctx->v_height = m_height;
-	m_fb_handler.resize_framebuffer(m_scene_fbo, m_width, m_height);
-	for (auto fbo : m_fbos) {
-		m_fb_handler.resize_framebuffer(fbo, m_width, m_height);
+	for (auto passes : m_passes) {
+		m_fb_handler.resize_framebuffer(passes.get_fbo(), m_width, m_height);
 	}
 }
 

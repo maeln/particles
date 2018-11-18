@@ -11,6 +11,7 @@
 #include "src/graph/scene/scene_context.hh"
 #include "src/graph/scene/scene_graph.hh"
 #include "src/object/camera/camera.hh"
+#include "src/post/pass/pass.hh"
 #include "src/shaders/shaderdb.hh"
 
 #include <GLFW/glfw3.h>
@@ -64,13 +65,11 @@ private:
 	std::shared_ptr<Camera> m_camera;
 	glm::mat4 m_perpective_matrix;
 
-	SceneGraph m_scene;
-	GLuint m_scene_fbo;
+	std::shared_ptr<SceneGraph> m_scene;
 	SceneGraph m_fs_scene;
 
 	// Should fin a better way to handle multiple post pass.
-	std::vector<SceneGraph> m_fs_scenes;
-	std::vector<GLuint> m_fbos;
+	std::vector<Pass> m_passes;
 
 	std::shared_ptr<SceneContext> m_ctx;
 
