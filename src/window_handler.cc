@@ -116,7 +116,7 @@ void WindowHandler::setup()
 	particles->set_name("parts1");
 	*/
 
-	std::shared_ptr<SquareEmitter> emitter(new SquareEmitter(glm::vec3(32.0, 6.0, 32.0), glm::vec3(128.0, 4.0, 128.0), glm::vec4(0.4, 0.1, 0.8, 1.0)));
+	std::shared_ptr<SquareEmitter> emitter(new SquareEmitter(glm::vec3(25.0, 5.0, 25.0), glm::vec3(128.0, 16.0, 128.0), glm::vec4(0.4, 0.1, 0.8, 1.0)));
 	emitter->set_name("emitter1");
 
 	std::shared_ptr<Plane> plane(new Plane());
