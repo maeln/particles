@@ -12,6 +12,7 @@
  */
 class IndicedMesh : public Mesh {
 public:
+	// TODO: Handle normals
 	IndicedMesh(std::unique_ptr<std::vector<float>> vertex, std::unique_ptr<std::vector<GLuint>> indices, GLenum render_mode, GLuint nb_vert_per_draw);
 	~IndicedMesh();
 

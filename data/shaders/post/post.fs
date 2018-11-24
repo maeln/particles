@@ -9,8 +9,8 @@ uniform vec2 resolution;
 
 uniform sampler2D screenTexture;
 
-#define MAX_DIST 1.5
-#define MIN_DIST 1.1
+#define MAX_DIST 3.2
+#define MIN_DIST 2.6
 #define ITER_DIST 20
 
 #define PI 3.141592
@@ -27,6 +27,24 @@ vec3 aberrationColor(float f)
 {
 	f = f * 3.0 - 1.5;
 	return saturate(vec3(-f, 1.0 - abs(f), f));
+}
+
+// CRT distortion from https://www.shadertoy.com/view/4sf3Dr
+vec2 crt(vec2 coord, float bend)
+{
+	// put in symmetrical coords
+	coord = (coord - 0.5) * 2.0;
+
+	coord *= 1.1;
+
+	// deform coords
+	coord.x *= 1.0 + pow((abs(coord.y) / bend), 2.0);
+	coord.y *= 1.0 + pow((abs(coord.x) / bend), 2.0);
+
+	// transform back to 0.0 - 1.0 space
+	coord = (coord / 2.0) + 0.5;
+
+	return coord;
 }
 
 vec2 brownConradyDistortion(vec2 uv, float factor)
@@ -51,7 +69,7 @@ vec3 frame(vec2 uv) { return pow(texture(screenTexture, uv).rgb, vec3(2.2)); }
 void main()
 {
 	vec2 uv = gl_FragCoord.xy / resolution.xy;
-	vec2 d = brownConradyDistortion(uv, MAX_DIST);
+	vec2 d = distort(uv, 1.0, MIN_DIST, MAX_DIST);
 	if (d.x > 1.0 || d.x < 0.0 || d.y > 1.0 || d.y < 0.0) {
 		discard;
 	}
