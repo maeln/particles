@@ -29,6 +29,7 @@ public:
 
 	void draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model)
 	{
+
 		if (m_clear) {
 			// Clean Window.
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);

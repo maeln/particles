@@ -76,7 +76,7 @@ WindowHandler::WindowHandler()
 	m_camera = std::shared_ptr<Camera>(new Camera(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 1.f, 0.f), 0.5f, 0.01f));
 	m_ctx->activeCamera = m_camera;
 
-	m_scene = std::shared_ptr<SceneGraph>(new SceneGraph());
+	m_scene = std::shared_ptr<SceneGraph>(new SceneGraph(false));
 
 	m_vsync = true;
 }
@@ -116,7 +116,13 @@ void WindowHandler::setup()
 	particles->set_name("parts1");
 	*/
 
-	std::shared_ptr<SquareEmitter> emitter(new SquareEmitter(glm::vec3(25.0, 5.0, 25.0), glm::vec3(128.0, 16.0, 128.0), glm::vec4(0.4, 0.1, 0.8, 1.0)));
+	// Background gradiant
+	GLuint main_fbo = m_fb_handler.create_full_framebuffer(m_width, m_height);
+	std::shared_ptr<SceneGraph> pass_grad = std::shared_ptr<SceneGraph>(new SceneGraph());
+	pass_grad->add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/background/gradiant.fs")));
+	m_passes.push_back(Pass(pass_grad, main_fbo));
+
+	std::shared_ptr<SquareEmitter> emitter(new SquareEmitter(glm::vec3(4.0, 2.0, 4.0), glm::vec3(16.0, 16.0, 16.0), glm::vec4(0.4, 0.1, 0.8, 1.0)));
 	emitter->set_name("emitter1");
 
 	std::shared_ptr<Plane> plane(new Plane());
@@ -128,7 +134,7 @@ void WindowHandler::setup()
 	m_scene->add_child(plane);
 	m_scene->add_child(emitter);
 	//m_scene.add_child(particles);
-	m_passes.push_back(Pass(m_scene, m_fb_handler.create_full_framebuffer(m_width, m_height)));
+	m_passes.push_back(Pass(m_scene, main_fbo));
 
 	/* Set up the fs quad */
 
@@ -235,17 +241,24 @@ void WindowHandler::rendering_loop()
 		m_ctx->t_time = m_dt_acc;
 		m_ctx->f_time = m_frame_dt;
 
-		// Pass 0: The scene
+		// Pass 0: Background gradiant:
+		glDisable(GL_DEPTH_TEST);
 		m_passes[0].render(m_ctx);
+		glEnable(GL_DEPTH_TEST);
+
+		// Pass 0: The scene
+		glBindTexture(GL_TEXTURE_2D, m_fb_handler.get_framebuffer(m_passes[0].get_fbo()).color);
+		m_passes[1].render(m_ctx);
 
 		// Pass 1: Chroma aberation + barrel distortion
 		// Pass 2: Luma computation
 		// Pass 3: FXAA
-
-		for (GLuint i = 0; i < 3; ++i) {
+		glDisable(GL_DEPTH_TEST);
+		for (GLuint i = 1; i < m_passes.size() - 1; ++i) {
 			glBindTexture(GL_TEXTURE_2D, m_fb_handler.get_framebuffer(m_passes[i].get_fbo()).color);
 			m_passes[i + 1].render(m_ctx);
 		}
+		glEnable(GL_DEPTH_TEST);
 
 		glUseProgram(0);
 

@@ -114,7 +114,7 @@ void ParticleHandler::update_particules(float time, float dt, float speed_factor
 		glUniform1f(program->uniforms_location["speed"], speed_factor);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_vbo_pos);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_vbo_ttl);
-		glDispatchCompute(m_max_part / 128, 1, 1);
+		glDispatchCompute(m_max_part > 128 ? m_max_part / 128 : 1, 1, 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		glUseProgram(0);
 	}

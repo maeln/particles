@@ -82,7 +82,7 @@ void SquareEmitter::update_particles(std::shared_ptr<SceneContext> ctx)
 		glUniform3f(program->uniforms_location["square"], m_square.x, m_square.y, m_square.z);
 		glUniform3f(program->uniforms_location["density"], m_density.x, m_density.y, m_density.z);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_offset);
-		glDispatchCompute(m_nbparts / 128, 1, 1);
+		glDispatchCompute(m_nbparts > 128 ? m_nbparts / 128 : 1, 1, 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		glUseProgram(0);
 	}
