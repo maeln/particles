@@ -17,6 +17,7 @@ public:
 	glm::mat4 reset_transform()
 	{
 		m_stack.clear();
+		return glm::mat4();
 	};
 
 	void commit_transform()

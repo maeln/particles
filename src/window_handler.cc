@@ -37,8 +37,8 @@ WindowHandler::WindowHandler()
 	glfwSetErrorCallback(&WindowHandler::fw_error_callback);
 
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 
@@ -122,8 +122,10 @@ void WindowHandler::setup()
 	pass_grad->add_child(std::shared_ptr<FSQuad>(new FSQuad("data/shaders/background/gradiant.fs")));
 	m_passes.push_back(Pass(pass_grad, main_fbo));
 
+#ifndef __APPLE__
 	std::shared_ptr<SquareEmitter> emitter(new SquareEmitter(glm::vec3(4.0, 2.0, 4.0), glm::vec3(16.0, 16.0, 16.0), glm::vec4(0.4, 0.1, 0.8, 1.0)));
 	emitter->set_name("emitter1");
+#endif
 
 	std::shared_ptr<Plane> plane(new Plane());
 	plane->translate(glm::vec3(0.0, -0.5, 0.0));
@@ -132,7 +134,9 @@ void WindowHandler::setup()
 
 	// Set up the scene
 	m_scene->add_child(plane);
+#ifndef __APPLE__
 	m_scene->add_child(emitter);
+#endif
 	//m_scene.add_child(particles);
 	m_passes.push_back(Pass(m_scene, main_fbo));
 
@@ -273,14 +277,12 @@ void WindowHandler::rendering_loop()
 			m_shader_reload_counter = 0.0;
 		}
 
-		/*
-		auto plane = m_scene.find_node("plane1");
+		auto plane = m_scene->find_node("plane1");
 		if (plane) {
 			std::shared_ptr<Plane> plane_ptr = std::dynamic_pointer_cast<Plane>(*plane);
 			plane_ptr->rotate(glm::vec3(1.0, 0.0, 0.0), (3.1415 / 4.0) * m_frame_dt);
 			plane_ptr->commit_transform();
 		}
-		*/
 
 		auto end
 			= std::chrono::system_clock::now();
