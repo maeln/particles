@@ -1,6 +1,6 @@
 #version 330
 
-layout(location = 0) in vec4 position;
+layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
 
 uniform mat4 projection;
@@ -13,7 +13,8 @@ out vec4 transposed_normal;
 void main()
 {
 	vec4 pos = projection * view * model * vec4(position, 1.0);
+	gl_Position = pos;
+
 	projected_position = pos;
-	transposed_matrix = normalize(transpose(projection) * normal);
-	gl_Position = projection * view * model * vec4(position, 1.0);
+	transposed_normal = normalize(transpose(projection) * vec4(normal, 1.0));
 }

@@ -38,8 +38,8 @@ vec3 phong(vec3 hit, vec3 eye, vec3 N, pLight light, float ks)
 void main()
 {
 	pLight l1 = pLight(
-		light_pos * model * view,
+		(vec4(light_pos, 1.0) * model * view).xyz,
 		vec3(0.1), vec3(0.5), vec3(0.8));
 
-	color = phong(projected_position.xyz, eye_pos, transposed_normal.xyz, l1, 1.0);
+	color = vec4(phong(projected_position.xyz, eye_pos, transposed_normal.xyz, l1, 1.0), 1.0);
 }

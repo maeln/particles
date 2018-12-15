@@ -1,0 +1,6 @@
+# CMake VS Studio 64Bits
+cmake -G "Visual Studio 15 2017 Win64" ..
+
+# MSBuild
+msbuild.exe -m parts.sln
+

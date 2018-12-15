@@ -16,6 +16,7 @@
 
 #include "src/object/particle/particle_handler.hh"
 #include "src/object/particle/square_emitter/square_emitter.hh"
+#include "src/object/primitive/cube/cube.hh"
 #include "src/object/primitive/fs_quad/fs_quad.hh"
 #include "src/object/primitive/plane/plane.hh"
 
@@ -130,8 +131,15 @@ void WindowHandler::setup()
 	plane->commit_transform();
 	plane->set_name("plane1");
 
+	std::shared_ptr<Cube> cube(new Cube("data/shaders/basic/projection.vs", "data/shaders/basic/phong/phong.fs"));
+	//cube->translate(glm::vec3(0.0, 1.0, 0.0));
+	//cube->rotate(glm::vec3(0.0, 0.5, 0.3), 3.1415 / 3.0);
+	cube->commit_transform();
+	cube->set_name("cube1");
+
 	// Set up the scene
 	m_scene->add_child(plane);
+	m_scene->add_child(cube);
 	m_scene->add_child(emitter);
 	//m_scene.add_child(particles);
 	m_passes.push_back(Pass(m_scene, main_fbo));
