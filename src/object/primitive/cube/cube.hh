@@ -21,6 +21,6 @@ public:
 private:
 	CubeMesh m_mesh;
 	Material m_material;
-	MaterialData m_uniforms;
+	std::shared_ptr<MaterialData> m_uniforms;
 	ShaderDB& m_shaderdb = ShaderDB::instance();
 };

@@ -136,6 +136,8 @@ void WindowHandler::setup()
 	//cube->rotate(glm::vec3(0.0, 0.5, 0.3), 3.1415 / 3.0);
 	cube->commit_transform();
 	cube->set_name("cube1");
+	cube->scale(glm::vec3(0.2, 0.2, 0.2));
+	cube->commit_transform();
 
 	// Set up the scene
 	m_scene->add_child(plane);
