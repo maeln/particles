@@ -202,14 +202,14 @@ void WindowHandler::rendering_loop()
 		ImGui::Text("dt  : %.2fms", m_frame_dt * 1000.0);
 		ImGui::Text("fps : %.2f", 1.0 / m_frame_dt);
 
-		auto node_parts = m_scene->find_node("parts1");
+		auto node_parts = m_scene->find_node("emitter1");
 		if (node_parts) {
-			std::shared_ptr<ParticleHandler> parts1 = std::dynamic_pointer_cast<ParticleHandler>(*node_parts);
-			glm::vec3 parts_color = parts1->get_colour();
-			float col[3] = { parts_color.r, parts_color.g, parts_color.b };
-			changed = ImGui::ColorEdit3("Parts colour", col);
+			std::shared_ptr<SquareEmitter> parts1 = std::dynamic_pointer_cast<SquareEmitter>(*node_parts);
+			glm::vec4 parts_color = parts1->get_colour();
+			float col[4] = { parts_color.r, parts_color.g, parts_color.b, parts_color.a };
+			changed = ImGui::ColorEdit4("Parts colour", col);
 			if (changed) {
-				parts1->set_colour(glm::vec3(col[0], col[1], col[2]));
+				parts1->set_colour(glm::vec4(col[0], col[1], col[2], col[3]));
 			}
 		}
 
