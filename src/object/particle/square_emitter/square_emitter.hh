@@ -15,6 +15,9 @@ public:
 
 	void draw(std::shared_ptr<SceneContext>, glm::mat4x4);
 
+	void set_colour(glm::vec4 col);
+	glm::vec4 get_colour();
+
 private:
 	void update_particles(std::shared_ptr<SceneContext> ctx);
 

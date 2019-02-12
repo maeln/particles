@@ -128,3 +128,6 @@ void SquareEmitter::draw(std::shared_ptr<SceneContext> ctx, glm::mat4x4 model)
 
 	SceneNode::draw(ctx, parts_model);
 }
+
+void SquareEmitter::set_colour(glm::vec4 col) { m_color = col; }
+glm::vec4 SquareEmitter::get_colour() { return m_color; }

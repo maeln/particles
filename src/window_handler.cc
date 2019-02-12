@@ -16,6 +16,7 @@
 
 #include "src/object/particle/particle_handler.hh"
 #include "src/object/particle/square_emitter/square_emitter.hh"
+#include "src/object/primitive/cube/cube.hh"
 #include "src/object/primitive/fs_quad/fs_quad.hh"
 #include "src/object/primitive/plane/plane.hh"
 
@@ -132,8 +133,17 @@ void WindowHandler::setup()
 	plane->commit_transform();
 	plane->set_name("plane1");
 
+	std::shared_ptr<Cube> cube(new Cube("data/shaders/basic/projection.vs", "data/shaders/basic/phong/phong.fs"));
+	//cube->translate(glm::vec3(0.0, 1.0, 0.0));
+	//cube->rotate(glm::vec3(0.0, 0.5, 0.3), 3.1415 / 3.0);
+	cube->commit_transform();
+	cube->set_name("cube1");
+	cube->scale(glm::vec3(0.2, 0.2, 0.2));
+	cube->commit_transform();
+
 	// Set up the scene
 	m_scene->add_child(plane);
+	m_scene->add_child(cube);
 #ifndef __APPLE__
 	m_scene->add_child(emitter);
 #endif
@@ -196,14 +206,14 @@ void WindowHandler::rendering_loop()
 		ImGui::Text("dt  : %.2fms", m_frame_dt * 1000.0);
 		ImGui::Text("fps : %.2f", 1.0 / m_frame_dt);
 
-		auto node_parts = m_scene->find_node("parts1");
+		auto node_parts = m_scene->find_node("emitter1");
 		if (node_parts) {
-			std::shared_ptr<ParticleHandler> parts1 = std::dynamic_pointer_cast<ParticleHandler>(*node_parts);
-			glm::vec3 parts_color = parts1->get_colour();
-			float col[3] = { parts_color.r, parts_color.g, parts_color.b };
-			changed = ImGui::ColorEdit3("Parts colour", col);
+			std::shared_ptr<SquareEmitter> parts1 = std::dynamic_pointer_cast<SquareEmitter>(*node_parts);
+			glm::vec4 parts_color = parts1->get_colour();
+			float col[4] = { parts_color.r, parts_color.g, parts_color.b, parts_color.a };
+			changed = ImGui::ColorEdit4("Parts colour", col);
 			if (changed) {
-				parts1->set_colour(glm::vec3(col[0], col[1], col[2]));
+				parts1->set_colour(glm::vec4(col[0], col[1], col[2], col[3]));
 			}
 		}
 
