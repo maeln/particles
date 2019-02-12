@@ -11,7 +11,7 @@ std::optional<Shader> ShaderDB::get_shader(GLuint handler)
 	if (it == m_shaders.end()) {
 		return {};
 	}
-	return std::optional(it->second);
+	return std::optional<Shader>(it->second);
 }
 
 std::optional<Program> ShaderDB::get_program(GLuint handler)
@@ -20,7 +20,7 @@ std::optional<Program> ShaderDB::get_program(GLuint handler)
 	if (it == m_programs.end()) {
 		return {};
 	}
-	return std::optional(it->second);
+	return std::optional<Program>(it->second);
 }
 
 GLenum ShaderDB::shader_type(std::string path)
@@ -98,7 +98,7 @@ std::optional<Shader> ShaderDB::load_shader(std::string path)
 
 	m_shaders[shader.handler] = shader;
 	m_shaders_path[path] = shader.handler;
-	return std::optional(shader);
+	return std::optional<Shader>(shader);
 }
 
 std::optional<GLuint> ShaderDB::load_program(const std::initializer_list<std::string> shaders_path)
@@ -150,7 +150,7 @@ std::optional<GLuint> ShaderDB::load_program(const std::initializer_list<std::st
 	}
 
 	m_programs[program.handler] = program;
-	return std::optional(program.handler);
+	return std::optional<GLuint>(program.handler);
 }
 
 bool ShaderDB::reload_program(GLuint handler)

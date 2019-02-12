@@ -4,7 +4,7 @@ Yet another opengl engine.
 ![Demo GIF](https://raw.githubusercontent.com/maeln/particles/master/demo.gif)
 
 To Do:
-- [ ] Add render target to drawable
+- [X] Add render target to drawable
 - [x] Add live reload of shaders 
 - [ ] Implement post-processing facility
   - HDR

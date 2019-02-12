@@ -6,3 +6,4 @@ build/
 *.exe
 *.ilk
 *.pdb
+.DS_Store
