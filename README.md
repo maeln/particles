@@ -10,7 +10,7 @@ To Do:
   - HDR
   - Bloom
   - Bokeh DoF
-  - Lens distortion w/ chromatic aberation
+  - Lens distortion w/ chromatic aberration
   - Glitch
 - [ ] Use ImGUI and allow runtime editing of most variables
 - [ ] Use UBO
